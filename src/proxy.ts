@@ -1,33 +1,28 @@
 import { NextRequest, NextResponse } from 'next/server'
-export { default } from "next-auth/middleware"
-import { getToken } from "next-auth/jwt"
- 
-// This function can be marked `async` if using `await` inside
-export async function proxy(request: NextRequest) {
+import { getToken } from 'next-auth/jwt'
+
+export default async function proxy(request: NextRequest) {
 
   const token = await getToken({ req: request })
   const url = request.nextUrl
-
-  if ( token && (
+  const isPublicAuthPage =
+    url.pathname === '/' ||
     url.pathname.startsWith('/sign-in') ||
     url.pathname.startsWith('/sign-up') ||
-    url.pathname.startsWith('/') ||
     url.pathname.startsWith('/verify')
-  )) {
+
+  if (token && isPublicAuthPage) {
     return NextResponse.redirect(new URL('/dashboard', request.url))
   }
 
-  if(!token && url.pathname.startsWith("/dashboard")) {
-        return NextResponse.redirect(new URL('sign-in', request.url));
-    }
+  if (!token && url.pathname.startsWith('/dashboard')) {
+    return NextResponse.redirect(new URL('/sign-in', request.url))
+  }
 
-    return NextResponse.next()
+  return NextResponse.next()
 
 }
- 
-// Alternatively, you can use a default export:
-// export default function proxy(request: NextRequest) { ... }
- 
+
 export const config = {
   matcher: [
     '/sign-in',

@@ -12,8 +12,8 @@ import axios, { AxiosError } from 'axios';
 import { Loader2, RefreshCcw } from 'lucide-react';
 import { User } from 'next-auth';
 import { useSession } from 'next-auth/react';
-import React, { useCallback, useEffect, useState } from 'react';
-import { Controller, useForm } from 'react-hook-form';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { Controller, useForm, useWatch } from 'react-hook-form';
 import { z } from 'zod';
 import { acceptMessageSchema } from '@/schemas/acceptMessageSchema';
 
@@ -23,8 +23,6 @@ function UserDashboard() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isSwitchLoading, setIsSwitchLoading] = useState(false);
-  const [profileUrl, setProfileUrl] = useState('');
-
   const { data: session } = useSession();
 
   const handleDeleteMessage = (messageId: string) => {
@@ -33,22 +31,38 @@ function UserDashboard() {
     );
   };
 
-  const { control, watch, setValue } = useForm<AcceptMessageFormData>({
+  const { control, setValue } = useForm<AcceptMessageFormData>({
     resolver: zodResolver(acceptMessageSchema),
+    defaultValues: {
+      acceptMessages: false,
+    },
   });
 
-  const acceptMessages = watch('acceptMessages');
+  const acceptMessages = useWatch({
+    control,
+    name: 'acceptMessages',
+  });
 
   const fetchAcceptMessages = useCallback(async () => {
     setIsSwitchLoading(true);
     try {
       const response = await axios.get<ApiResponse>('/api/accept-messages');
-      setValue('acceptMessages', response.data.isAcceptingMessage);
+      setValue(
+        'acceptMessages',
+        typeof response.data.isAcceptingMessage === 'boolean'
+          ? response.data.isAcceptingMessage
+          : false
+      );
     } catch (error) {
       const axiosError = error as AxiosError<ApiResponse>;
-      toast.error(
-        axiosError.response?.data.message || 'Failed to fetch message settings'
-      );
+      const status = axiosError.response?.status;
+      const message = axiosError.response?.data.message;
+
+      if (status === 404 && message === 'User not found.') {
+        toast.error('User not found.');
+      } else {
+        toast.error(message || 'Failed to fetch message settings');
+      }
     } finally {
       setIsSwitchLoading(false);
     }
@@ -64,7 +78,14 @@ function UserDashboard() {
       }
     } catch (error) {
       const axiosError = error as AxiosError<ApiResponse>;
-      toast.error(axiosError.response?.data.message ?? 'Failed to fetch messages');
+      const status = axiosError.response?.status;
+      const message = axiosError.response?.data.message;
+
+      if (status === 404 && message === 'User not found.') {
+        toast.error('User not found.');
+      } else {
+        toast.error(message ?? 'Failed to fetch messages');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -77,11 +98,10 @@ function UserDashboard() {
     fetchAcceptMessages();
   }, [session, fetchAcceptMessages, fetchMessages]);
 
-  // Build the profile URL on the client only, once we know the username
-  useEffect(() => {
-    if (!session?.user || typeof window === 'undefined') return;
+  const profileUrl = useMemo(() => {
+    if (!session?.user || typeof window === 'undefined') return '';
     const { username } = session.user as User;
-    setProfileUrl(`${window.location.origin}/u/${username}`);
+    return `${window.location.origin}/u/${username}`;
   }, [session]);
 
   const handleSwitchChange = async (checked: boolean) => {
@@ -93,9 +113,14 @@ function UserDashboard() {
       toast.success(response.data.message);
     } catch (error) {
       const axiosError = error as AxiosError<ApiResponse>;
-      toast.error(
-        axiosError.response?.data.message || 'Failed to update message settings'
-      );
+      const status = axiosError.response?.status;
+      const message = axiosError.response?.data.message;
+
+      if (status === 404 && message === 'User not found.') {
+        toast.error('User not found.');
+      } else {
+        toast.error(message || 'Failed to update message settings');
+      }
     }
   };
 

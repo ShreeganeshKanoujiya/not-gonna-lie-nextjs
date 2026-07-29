@@ -3,45 +3,40 @@ import { authOptions } from "../auth/[...nextauth]/options";
 import dbConnect from "@/lib/dbConnect";
 import UserModel from "@/model/User";
 import { User } from "next-auth";
-import mongoose from "mongoose";
 
 export async function GET(request: Request) {
-    await dbConnect();
-
     await dbConnect();
 
     const session = await getServerSession(authOptions);
     const user: User = session?.user as User;
 
-    if (!session || !session.user) {
+    if (!session || !user.id) {
         return Response.json({
             success: false,
             message: "Unauthorized access. Please log in.",
         }, { status: 401 });
     }
 
-    const userId = new mongoose.Types.ObjectId(user._id);
     try {
-        const user = await UserModel.aggregate([
-            { $match: { _id: userId } },
-            { $unwind: "$message" },
-            { $sort: { "message.createdAt": -1 } },
-            { $group: {
-                _id: "$_id",
-                messages: { $push: "$message" }
-            }}
-        ]);
+        const foundUser = await UserModel.findById(user.id).select('message');
 
-        if (!user || user.length === 0) {
+        if (!foundUser) {
             return Response.json({
                 success: false,
                 message: "User not found.",
             }, { status: 404 });
         }
+
+        const messages = [...foundUser.message].sort(
+            (firstMessage, secondMessage) =>
+                new Date(secondMessage.createdAt).getTime() -
+                new Date(firstMessage.createdAt).getTime()
+        );
+
         return Response.json({
             success: true,
             message: "Messages retrieved successfully.",
-            messages: user[0].messages,
+            messages,
         }, { status: 200});
 
     } catch (error) {

@@ -10,14 +10,14 @@ export async function POST(request: Request) {
     const session = await getServerSession(authOptions);
     const user: User = session?.user as User;
 
-    if (!session || !session.user) {
+    if (!session || !user.id) {
         return Response.json({
             success: false,
             message: "Unauthorized access. Please log in.",
         }, { status: 401 });
     }
 
-    const userId = user._id;
+    const userId = user.id;
     const { acceptMessages } = await request.json();
 
     try {
@@ -53,14 +53,14 @@ export async function GET(request: Request) {
     const session = await getServerSession(authOptions);
     const user: User = session?.user as User;
 
-    if (!session || !session.user) {
+    if (!session || !user.id) {
         return Response.json({
             success: false,
             message: "Unauthorized access. Please log in.",
         }, { status: 401 });
     }
 
-    const userId = user._id;
+    const userId = user.id;
 
     try {
         const foundUser = await UserModel.findById(userId);
