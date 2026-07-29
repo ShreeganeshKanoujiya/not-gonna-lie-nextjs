@@ -1,9 +1,8 @@
+import mongoose from 'mongoose';
 import UserModel from '@/model/User';
 import { getServerSession } from 'next-auth/next';
 import dbConnect from '@/lib/dbConnect';
 import { User } from 'next-auth';
-import { Message } from '@/model/User';
-import { NextRequest } from 'next/server';
 import { authOptions } from '../../auth/[...nextauth]/options';
 
 export async function DELETE(
@@ -22,9 +21,17 @@ export async function DELETE(
   }
 
   try {
+    if (!mongoose.isValidObjectId(messageId)) {
+      return Response.json(
+        { success: false, message: 'Invalid message id' },
+        { status: 400 }
+      );
+    }
+
+    const messageObjectId = new mongoose.Types.ObjectId(messageId);
     const updateResult = await UserModel.updateOne(
       { _id: _user.id },
-      { $pull: { message: { _id: messageId } } }
+      { $pull: { message: { _id: messageObjectId } } }
     );
 
     if (updateResult.modifiedCount === 0) {

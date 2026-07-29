@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react';
+import React from 'react';
 import axios, { AxiosError } from 'axios';
 import dayjs from 'dayjs';
 import { X } from 'lucide-react';
@@ -33,17 +33,14 @@ export function MessageCard({ message, onMessageDelete }: MessageCardProps) {
       const response = await axios.delete<ApiResponse>(
         `/api/delete-message/${message._id}`
       );
-      toast(response.data.message);
+      toast.success(response.data.message || 'Message deleted successfully');
       onMessageDelete(message._id as string);
 
     } catch (error) {
       const axiosError = error as AxiosError<ApiResponse>;
-      toast({
-        title: 'Error',
-        description:
-          axiosError.response?.data.message ?? 'Failed to delete message',
-        variant: 'destructive',
-      });
+      toast.error(
+        axiosError.response?.data.message ?? 'Failed to delete message'
+      );
     } 
   };
 
