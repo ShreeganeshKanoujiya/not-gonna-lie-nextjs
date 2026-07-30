@@ -30,7 +30,7 @@ export default function SendMessage() {
   const params = useParams<{ username: string }>();
   const username = params.username;
 
-  const form = useForm<z.infer<typeof messageSchema>>({
+  const form = useForm<z.input<typeof messageSchema>>({
     resolver: zodResolver(messageSchema),
     defaultValues: {
       content: '',
@@ -45,7 +45,7 @@ export default function SendMessage() {
 
   const [isLoading, setIsLoading] = useState(false);
 
-  const onSubmit = async (data: z.infer<typeof messageSchema>) => {
+  const onSubmit = async (data: z.input<typeof messageSchema>) => {
     setIsLoading(true);
     try {
       const response = await axios.post<ApiResponse>('/api/send-message', {
