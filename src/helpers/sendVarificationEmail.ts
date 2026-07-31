@@ -30,7 +30,7 @@ export async function sendVerificationEmail(
         console.error("Error sending verification email:", emailError);
         return {
             success: false,
-            message: "Failed to send verification email. Check your Resend sender domain and API key.",
+            message: "Failed to send verification email.",
             messages: [],
         }
     }
