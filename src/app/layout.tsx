@@ -1,21 +1,27 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Shippori_Mincho, Zen_Kaku_Gothic_New } from "next/font/google";
 import "./globals.css";
 import AuthProvider from "@/context/AuthProvider";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+import { Toaster } from "@/components/ui/sonner";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const shipporiMincho = Shippori_Mincho({
+  variable: "--font-display",
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const zenKaku = Zen_Kaku_Gothic_New({
+  variable: "--font-sans",
   subsets: ["latin"],
+  weight: ["300", "400", "500", "700"],
 });
 
 export const metadata: Metadata = {
   title: "Not Gonna Lie",
-  description: "Anonymous messages, verified identities, and a cleaner way to connect.",
+  description:
+    "Anonymous messages, verified identities, and a cleaner way to say the honest thing.",
 };
 
 export default function RootLayout({
@@ -26,11 +32,16 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${shipporiMincho.variable} ${zenKaku.variable} h-full antialiased`}
     >
-      <AuthProvider>
-        <body className="min-h-full flex flex-col">{children}</body>
-      </AuthProvider>
+      <body className="flex min-h-full flex-col bg-washi font-sans text-sumi">
+        <AuthProvider>
+          <Navbar />
+          <div className="flex-1">{children}</div>
+          <Footer />
+          <Toaster />
+        </AuthProvider>
+      </body>
     </html>
   );
 }

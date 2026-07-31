@@ -1,25 +1,31 @@
-'use client';
+"use client";
 
-import { ApiResponse } from '@/types/ApiResponse';
-import { zodResolver } from '@hookform/resolvers/zod';
-import Link from 'next/link';
-import { useEffect, useState } from 'react';
-import { Controller, useForm } from 'react-hook-form';
-import { useDebounceCallback } from 'usehooks-ts';
-import * as z from 'zod';
+import { ApiResponse } from "@/types/ApiResponse";
+import { zodResolver } from "@hookform/resolvers/zod";
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { useDebounceCallback } from "usehooks-ts";
+import * as z from "zod";
 
-import { Button } from '@/components/ui/button';
-import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field';
-import { Input } from '@/components/ui/input';
-import { toast } from 'sonner';
-import axios, { AxiosError } from 'axios';
-import { Loader2 } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import { signUpValidation } from '@/schemas/signUpSchema';
+import { Button } from "@/components/ui/button";
+import {
+  Field,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+  FieldDescription,
+} from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { toast } from "sonner";
+import axios, { AxiosError } from "axios";
+import { CheckCircle2, Loader2, XCircle } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { signUpValidation } from "@/schemas/signUpSchema";
 
 export default function SignUpForm() {
-  const [username, setUsername] = useState('');
-  const [usernameMessage, setUsernameMessage] = useState('');
+  const [username, setUsername] = useState("");
+  const [usernameMessage, setUsernameMessage] = useState("");
   const [isCheckingUsername, setIsCheckingUsername] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const debounced = useDebounceCallback(setUsername, 300);
@@ -29,9 +35,9 @@ export default function SignUpForm() {
   const form = useForm<z.infer<typeof signUpValidation>>({
     resolver: zodResolver(signUpValidation),
     defaultValues: {
-      username: '',
-      email: '',
-      password: '',
+      username: "",
+      email: "",
+      password: "",
     },
   });
 
@@ -39,7 +45,7 @@ export default function SignUpForm() {
     const checkUsernameUnique = async () => {
       if (username) {
         setIsCheckingUsername(true);
-        setUsernameMessage(''); // Reset message
+        setUsernameMessage("");
         try {
           const response = await axios.get<ApiResponse>(
             `/api/check-username-unique?username=${username}`
@@ -48,7 +54,7 @@ export default function SignUpForm() {
         } catch (error) {
           const axiosError = error as AxiosError<ApiResponse>;
           setUsernameMessage(
-            axiosError.response?.data.message ?? 'Error checking username'
+            axiosError.response?.data.message ?? "Error checking username"
           );
         } finally {
           setIsCheckingUsername(false);
@@ -58,22 +64,24 @@ export default function SignUpForm() {
     checkUsernameUnique();
   }, [username]);
 
+  const isUsernameAvailable = usernameMessage === "Username is available.";
+
   const onSubmit = async (data: z.infer<typeof signUpValidation>) => {
     setIsSubmitting(true);
     try {
-      const response = await axios.post<ApiResponse>('/api/sign-up', data);
+      const response = await axios.post<ApiResponse>("/api/sign-up", data);
 
       toast.success(response.data.message);
 
       router.replace(`/verify/${username}`);
     } catch (error) {
-      console.error('Error during sign-up:', error);
+      console.error("Error during sign-up:", error);
 
       const axiosError = error as AxiosError<ApiResponse>;
 
       const errorMessage =
         axiosError.response?.data.message ??
-        'There was a problem with your sign-up. Please try again.';
+        "There was a problem with your sign-up. Please try again.";
 
       toast.error(errorMessage);
     } finally {
@@ -82,39 +90,79 @@ export default function SignUpForm() {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-800">
-      <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-lg shadow-md">
+    <div className="relative flex min-h-[80vh] items-center justify-center overflow-hidden bg-sumi px-4 py-16">
+      {/* faint enso watermark, matches homepage motif */}
+      <svg
+        viewBox="0 0 200 200"
+        fill="none"
+        className="pointer-events-none absolute -left-16 -top-16 h-72 w-72 text-washi opacity-[0.04]"
+      >
+        <path
+          d="M100 20c-46 5-80 40-75 88 5 46 47 78 92 72 41-5 68-36 72-72"
+          stroke="currentColor"
+          strokeWidth="6"
+          strokeLinecap="round"
+        />
+      </svg>
+
+      <div className="relative w-full max-w-md rounded-2xl border border-washi/10 bg-card p-8 shadow-xl">
         <div className="text-center">
-          <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl mb-6">
-            Join Mystery Message
+          <div className="mx-auto mb-4 inline-flex items-center gap-2 rounded-full border border-shu/25 bg-shu/5 px-3 py-1 text-xs text-shu">
+            本音 · honne
+          </div>
+          <h1 className="font-display text-3xl tracking-tight text-sumi sm:text-4xl">
+            Join Not Gonna Lie
           </h1>
-          <p className="mb-4">Sign up to start your anonymous adventure</p>
+          <p className="mt-2 text-sm text-kobicha">
+            Create your inbox and start hearing what people really think
+          </p>
         </div>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="mt-8 space-y-6"
+        >
           <FieldGroup>
             <Controller
               name="username"
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="username">Username</FieldLabel>
-                  <Input
-                    {...field}
-                    id="username"
-                    aria-invalid={fieldState.invalid}
-                    onChange={(e) => {
-                      field.onChange(e);
-                      debounced(e.target.value);
-                    }}
-                  />
-                  {isCheckingUsername && <Loader2 className="animate-spin" />}
+                  <FieldLabel htmlFor="username" className="text-sumi">
+                    Username
+                  </FieldLabel>
+                  <div className="relative">
+                    <Input
+                      {...field}
+                      id="username"
+                      autoComplete="username"
+                      aria-invalid={fieldState.invalid}
+                      className="border-sumi/15 bg-washi pr-9 text-sumi focus-visible:border-aizome focus-visible:ring-aizome/30"
+                      onChange={(e) => {
+                        field.onChange(e);
+                        debounced(e.target.value);
+                      }}
+                    />
+                    {isCheckingUsername && (
+                      <Loader2 className="absolute right-2.5 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-kobicha" />
+                    )}
+                    {!isCheckingUsername && usernameMessage && (
+                      <span className="absolute right-2.5 top-1/2 -translate-y-1/2">
+                        {isUsernameAvailable ? (
+                          <CheckCircle2 className="h-4 w-4 text-aizome" />
+                        ) : (
+                          <XCircle className="h-4 w-4 text-shu" />
+                        )}
+                      </span>
+                    )}
+                  </div>
                   {!isCheckingUsername && usernameMessage && (
                     <p
-                      className={`text-sm ${
-                        usernameMessage === 'Username is unique'
-                          ? 'text-green-500'
-                          : 'text-red-500'
-                      }`}
+                      className={
+                        isUsernameAvailable
+                          ? "text-sm text-aizome"
+                          : "text-sm text-shu"
+                      }
                     >
                       {usernameMessage}
                     </p>
@@ -131,11 +179,20 @@ export default function SignUpForm() {
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="email">Email</FieldLabel>
-                  <Input {...field} id="email" aria-invalid={fieldState.invalid} />
-                  <p className="text-sm text-muted-foreground">
-                    We will send you a verification code
-                  </p>
+                  <FieldLabel htmlFor="email" className="text-sumi">
+                    Email
+                  </FieldLabel>
+                  <Input
+                    {...field}
+                    id="email"
+                    type="email"
+                    autoComplete="email"
+                    aria-invalid={fieldState.invalid}
+                    className="border-sumi/15 bg-washi text-sumi focus-visible:border-aizome focus-visible:ring-aizome/30"
+                  />
+                  <FieldDescription className="text-kobicha">
+                    We'll send you a verification code
+                  </FieldDescription>
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
                   )}
@@ -148,12 +205,16 @@ export default function SignUpForm() {
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="password">Password</FieldLabel>
+                  <FieldLabel htmlFor="password" className="text-sumi">
+                    Password
+                  </FieldLabel>
                   <Input
                     {...field}
                     id="password"
                     type="password"
+                    autoComplete="new-password"
                     aria-invalid={fieldState.invalid}
+                    className="border-sumi/15 bg-washi text-sumi focus-visible:border-aizome focus-visible:ring-aizome/30"
                   />
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
@@ -163,24 +224,30 @@ export default function SignUpForm() {
             />
           </FieldGroup>
 
-          <Button type="submit" className="w-full" disabled={isSubmitting}>
+          <Button
+            type="submit"
+            className="w-full rounded-full bg-sumi text-washi hover:bg-sumi/85"
+            disabled={isSubmitting}
+          >
             {isSubmitting ? (
               <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                <Loader2 data-icon="inline-start" className="animate-spin" />
                 Please wait
               </>
             ) : (
-              'Sign Up'
+              "Create your inbox"
             )}
           </Button>
         </form>
-        <div className="text-center mt-4">
-          <p>
-            Already a member?{' '}
-            <Link href="/sign-in" className="text-blue-600 hover:text-blue-800">
-              Sign in
-            </Link>
-          </p>
+
+        <div className="mt-6 text-center text-sm text-kobicha">
+          Already a member?{" "}
+          <Link
+            href="/sign-in"
+            className="font-medium text-aizome underline-offset-4 hover:underline"
+          >
+            Sign in
+          </Link>
         </div>
       </div>
     </div>
