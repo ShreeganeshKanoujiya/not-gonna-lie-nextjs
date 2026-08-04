@@ -73,7 +73,7 @@ export default function SignUpForm() {
 
       toast.success(response.data.message);
 
-      router.replace(`/verify/${username}`);
+      router.replace(`/verify/${encodeURIComponent(data.username)}`);
     } catch (error) {
       console.error("Error during sign-up:", error);
 
