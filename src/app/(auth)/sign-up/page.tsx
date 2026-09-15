@@ -41,6 +41,14 @@ export default function SignUpForm() {
       password: "",
     },
   });
+  const password = form.watch("password");
+  const passwordRequirements = [
+    { label: "At least 6 characters", met: password.length >= 6 },
+    { label: "One uppercase letter", met: /[A-Z]/.test(password) },
+    { label: "One lowercase letter", met: /[a-z]/.test(password) },
+    { label: "One number", met: /\d/.test(password) },
+    { label: "One special character (@ $ ! % * ? &)", met: /[@$!%*?&]/.test(password) },
+  ];
 
   useEffect(() => {
     const checkUsernameUnique = async () => {
@@ -216,6 +224,7 @@ export default function SignUpForm() {
                       type={showPassword ? "text" : "password"}
                       autoComplete="new-password"
                       aria-invalid={fieldState.invalid}
+                      aria-describedby={password ? "password-requirements" : undefined}
                       className="border-sumi/15 bg-washi pr-10 text-sumi focus-visible:border-aizome focus-visible:ring-aizome/30"
                     />
                     <button
@@ -228,6 +237,27 @@ export default function SignUpForm() {
                       {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>
                   </div>
+                  {password && (
+                    <ul
+                      id="password-requirements"
+                      aria-live="polite"
+                      className="space-y-1 text-sm"
+                    >
+                      {passwordRequirements.map(({ label, met }) => (
+                        <li
+                          key={label}
+                          className={`flex items-center gap-1.5 ${met ? "text-aizome" : "text-kobicha"}`}
+                        >
+                          {met ? (
+                            <CheckCircle2 className="h-4 w-4" aria-hidden="true" />
+                          ) : (
+                            <XCircle className="h-4 w-4" aria-hidden="true" />
+                          )}
+                          {label}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
                   )}
