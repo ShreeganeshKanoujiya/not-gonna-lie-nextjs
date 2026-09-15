@@ -5,12 +5,23 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 import { toast } from 'sonner';
 import { Message } from '@/model/User';
 import { ApiResponse } from '@/types/ApiResponse';
 import { zodResolver } from '@hookform/resolvers/zod';
 import axios, { AxiosError } from 'axios';
-import { Copy, Inbox, Loader2, RefreshCcw } from 'lucide-react';
+import { Copy, Inbox, Loader2, RefreshCcw, Trash2 } from 'lucide-react';
 import { User } from 'next-auth';
 import { useSession } from 'next-auth/react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -23,6 +34,8 @@ type AcceptMessageFormData = z.infer<typeof acceptMessageSchema>;
 function UserDashboard() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isDeletingAll, setIsDeletingAll] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isFetchingSettings, setIsFetchingSettings] = useState(false);
   const [isTogglePending, setIsTogglePending] = useState(false);
   const [profileUrl, setProfileUrl] = useState('');
@@ -147,6 +160,23 @@ function UserDashboard() {
     }
   };
 
+  const handleDeleteAllMessages = async () => {
+    setIsDeletingAll(true);
+    try {
+      const response = await axios.delete<ApiResponse>('/api/delete-messages');
+      setMessages([]);
+      setIsDeleteDialogOpen(false);
+      toast.success(response.data.message);
+    } catch (error) {
+      const axiosError = error as AxiosError<ApiResponse>;
+      toast.error(
+        axiosError.response?.data.message ?? 'Failed to delete messages',
+      );
+    } finally {
+      setIsDeletingAll(false);
+    }
+  };
+
   const displayName = useMemo(() => {
     if (!session?.user) return '';
     return (session.user as User).username ?? '';
@@ -227,23 +257,61 @@ function UserDashboard() {
 
       <div className="mt-10 flex items-center justify-between">
         <h2 className="font-display text-xl text-sumi">Messages</h2>
-        <Button
-          variant="outline"
-          size="sm"
-          disabled={isLoading}
-          className="border-sumi/20 text-sumi hover:bg-sumi hover:text-washi"
-          onClick={(e) => {
-            e.preventDefault();
-            fetchMessages(true);
-          }}
-        >
-          {isLoading ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
-          ) : (
-            <RefreshCcw className="h-4 w-4" />
-          )}
-          Refresh
-        </Button>
+        <div className="flex items-center gap-2">
+          <AlertDialog
+            open={isDeleteDialogOpen}
+            onOpenChange={setIsDeleteDialogOpen}
+          >
+            <AlertDialogTrigger
+              render={
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  disabled={messages.length === 0 || isDeletingAll}
+                />
+              }
+            >
+              {isDeletingAll ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Trash2 className="h-4 w-4" />
+              )}
+              Delete all
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Delete all messages?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This permanently removes every message from your inbox. This action cannot be undone.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel disabled={isDeletingAll}>Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  variant="destructive"
+                  disabled={isDeletingAll}
+                  onClick={handleDeleteAllMessages}
+                >
+                  Delete all messages
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={isLoading || isDeletingAll}
+            className="border-sumi/20 text-sumi hover:bg-sumi hover:text-washi"
+            onClick={() => fetchMessages(true)}
+          >
+            {isLoading ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <RefreshCcw className="h-4 w-4" />
+            )}
+            Refresh
+          </Button>
+        </div>
       </div>
 
       {messages.length > 0 ? (
