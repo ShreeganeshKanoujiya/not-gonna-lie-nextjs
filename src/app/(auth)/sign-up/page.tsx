@@ -19,7 +19,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import axios, { AxiosError } from "axios";
-import { CheckCircle2, Loader2, XCircle } from "lucide-react";
+import { CheckCircle2, Eye, EyeOff, Loader2, XCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { signUpValidation } from "@/schemas/signUpSchema";
 
@@ -28,6 +28,7 @@ export default function SignUpForm() {
   const [usernameMessage, setUsernameMessage] = useState("");
   const [isCheckingUsername, setIsCheckingUsername] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const debounced = useDebounceCallback(setUsername, 300);
 
   const router = useRouter();
@@ -208,14 +209,25 @@ export default function SignUpForm() {
                   <FieldLabel htmlFor="password" className="text-sumi">
                     Password
                   </FieldLabel>
-                  <Input
-                    {...field}
-                    id="password"
-                    type="password"
-                    autoComplete="new-password"
-                    aria-invalid={fieldState.invalid}
-                    className="border-sumi/15 bg-washi text-sumi focus-visible:border-aizome focus-visible:ring-aizome/30"
-                  />
+                  <div className="relative">
+                    <Input
+                      {...field}
+                      id="password"
+                      type={showPassword ? "text" : "password"}
+                      autoComplete="new-password"
+                      aria-invalid={fieldState.invalid}
+                      className="border-sumi/15 bg-washi pr-10 text-sumi focus-visible:border-aizome focus-visible:ring-aizome/30"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword((visible) => !visible)}
+                      aria-label={showPassword ? "Hide password" : "Show password"}
+                      aria-pressed={showPassword}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-kobicha transition-colors hover:text-sumi focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-aizome focus-visible:ring-offset-2"
+                    >
+                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </button>
+                  </div>
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
                   )}

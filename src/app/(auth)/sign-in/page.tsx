@@ -16,9 +16,12 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { signInSchema } from '@/schemas/signInSchema';
+import { Eye, EyeOff } from 'lucide-react';
+import { useState } from 'react';
 
 export default function SignInForm() {
     const router = useRouter();
+    const [showPassword, setShowPassword] = useState(false);
 
     const form = useForm<z.infer<typeof signInSchema>>({
         resolver: zodResolver(signInSchema),
@@ -117,14 +120,25 @@ export default function SignInForm() {
                                             Password
                                         </FieldLabel>
                                     </div>
-                                    <Input
-                                        {...field}
-                                        id="sign-in-password"
-                                        type="password"
-                                        aria-invalid={fieldState.invalid}
-                                        autoComplete="current-password"
-                                        className="border-sumi/15 bg-washi text-sumi focus-visible:border-aizome focus-visible:ring-aizome/30"
-                                    />
+                                    <div className="relative">
+                                        <Input
+                                            {...field}
+                                            id="sign-in-password"
+                                            type={showPassword ? 'text' : 'password'}
+                                            aria-invalid={fieldState.invalid}
+                                            autoComplete="current-password"
+                                            className="border-sumi/15 bg-washi pr-10 text-sumi focus-visible:border-aizome focus-visible:ring-aizome/30"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowPassword((visible) => !visible)}
+                                            aria-label={showPassword ? 'Hide password' : 'Show password'}
+                                            aria-pressed={showPassword}
+                                            className="absolute right-3 top-1/2 -translate-y-1/2 text-kobicha transition-colors hover:text-sumi focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-aizome focus-visible:ring-offset-2"
+                                        >
+                                            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                        </button>
+                                    </div>
                                     {fieldState.invalid && (
                                         <FieldError errors={[fieldState.error]} />
                                     )}
