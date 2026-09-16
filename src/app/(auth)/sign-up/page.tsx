@@ -19,7 +19,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import axios, { AxiosError } from "axios";
-import { CheckCircle2, Eye, EyeOff, Loader2, XCircle } from "lucide-react";
+import { ArrowRight, CheckCircle2, Eye, EyeOff, Loader2, LockKeyhole, Sparkles, XCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { signUpValidation } from "@/schemas/signUpSchema";
 
@@ -99,7 +99,9 @@ export default function SignUpForm() {
   };
 
   return (
-    <div className="relative flex min-h-[80vh] items-center justify-center overflow-hidden bg-sumi px-4 py-16">
+    <main className="relative isolate flex min-h-[calc(100svh-1px)] items-center justify-center overflow-hidden bg-sumi px-3 py-24 text-washi sm:px-6 sm:py-32">
+      <div className="pointer-events-none absolute inset-0 opacity-50 [background-image:radial-gradient(circle_at_12%_18%,#e95776_0,transparent_24rem),radial-gradient(circle_at_85%_82%,#7063ff_0,transparent_28rem)]" />
+      <div className="pointer-events-none absolute -right-20 top-28 size-20 rotate-12 rounded-[1.7rem] bg-coral/90" />
       {/* faint enso watermark, matches homepage motif */}
       <svg
         viewBox="0 0 200 200"
@@ -114,22 +116,25 @@ export default function SignUpForm() {
         />
       </svg>
 
-      <div className="relative w-full max-w-md rounded-2xl border border-washi/10 bg-card p-8 shadow-xl">
+      <div className="relative w-full max-w-md rounded-[1.75rem] border border-washi/15 bg-washi p-4 text-sumi shadow-[0_28px_80px_rgba(0,0,0,0.32)] min-[380px]:p-5 sm:rounded-[2rem] sm:p-8">
         <div className="text-center">
-          <div className="mx-auto mb-4 inline-flex items-center gap-2 rounded-full border border-shu/25 bg-shu/5 px-3 py-1 text-xs text-shu">
-            本音 · honne
+          <div className="mx-auto mb-4 inline-flex items-center gap-2 rounded-full bg-sumi px-3 py-1.5 text-xs font-semibold tracking-wide text-lime">
+            <LockKeyhole className="size-3.5" /> Secure sign up
           </div>
-          <h1 className="font-display text-3xl tracking-tight text-sumi sm:text-4xl">
-            Join Not Gonna Lie
+          <div className="mb-4 flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-[0.24em] text-coral sm:hidden">
+            <Sparkles className="size-3.5" /> Not Gonna Lie
+          </div>
+          <h1 className="font-display text-[2.15rem] leading-none tracking-[-0.055em] text-sumi sm:text-5xl">
+            Make room for honesty.
           </h1>
-          <p className="mt-2 text-sm text-kobicha">
+          <p className="mt-3 text-sm leading-6 text-kobicha">
             Create your inbox and start hearing what people really think
           </p>
         </div>
 
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="mt-8 space-y-6"
+          className="mt-7 space-y-6 sm:mt-8"
         >
           <FieldGroup>
             <Controller
@@ -146,21 +151,22 @@ export default function SignUpForm() {
                       id="username"
                       autoComplete="username"
                       aria-invalid={fieldState.invalid}
-                      className="border-sumi/15 bg-washi pr-9 text-sumi focus-visible:border-aizome focus-visible:ring-aizome/30"
+                      placeholder="Choose a username"
+                      className="h-13 rounded-xl border-sumi/15 bg-white px-4 pr-11 text-base text-sumi shadow-none placeholder:text-kobicha/55 focus-visible:border-aizome focus-visible:ring-aizome/25"
                       onChange={(e) => {
                         field.onChange(e);
                         debounced(e.target.value);
                       }}
                     />
                     {isCheckingUsername && (
-                      <Loader2 className="absolute right-2.5 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-kobicha" />
+                      <Loader2 className="absolute right-3 top-1/2 size-[1.1rem] -translate-y-1/2 animate-spin text-kobicha" />
                     )}
                     {!isCheckingUsername && usernameMessage && (
                       <span className="absolute right-2.5 top-1/2 -translate-y-1/2">
                         {isUsernameAvailable ? (
-                          <CheckCircle2 className="h-4 w-4 text-aizome" />
+                          <CheckCircle2 className="size-[1.1rem] text-aizome" />
                         ) : (
-                          <XCircle className="h-4 w-4 text-shu" />
+                          <XCircle className="size-[1.1rem] text-shu" />
                         )}
                       </span>
                     )}
@@ -197,10 +203,11 @@ export default function SignUpForm() {
                     type="email"
                     autoComplete="email"
                     aria-invalid={fieldState.invalid}
-                    className="border-sumi/15 bg-washi text-sumi focus-visible:border-aizome focus-visible:ring-aizome/30"
+                    placeholder="you@example.com"
+                    className="h-13 rounded-xl border-sumi/15 bg-white px-4 text-base text-sumi shadow-none placeholder:text-kobicha/55 focus-visible:border-aizome focus-visible:ring-aizome/25"
                   />
                   <FieldDescription className="text-kobicha">
-                    We'll send you a verification code
+                    We&apos;ll send you a verification code
                   </FieldDescription>
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
@@ -225,14 +232,15 @@ export default function SignUpForm() {
                       autoComplete="new-password"
                       aria-invalid={fieldState.invalid}
                       aria-describedby={password ? "password-requirements" : undefined}
-                      className="border-sumi/15 bg-washi pr-10 text-sumi focus-visible:border-aizome focus-visible:ring-aizome/30"
+                      placeholder="Create a password"
+                      className="h-13 rounded-xl border-sumi/15 bg-white px-4 pr-12 text-base text-sumi shadow-none placeholder:text-kobicha/55 focus-visible:border-aizome focus-visible:ring-aizome/25"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword((visible) => !visible)}
                       aria-label={showPassword ? "Hide password" : "Show password"}
                       aria-pressed={showPassword}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-kobicha transition-colors hover:text-sumi focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-aizome focus-visible:ring-offset-2"
+                      className="absolute right-2 top-1/2 grid size-10 -translate-y-1/2 place-items-center rounded-lg text-kobicha transition-colors hover:bg-sumi/5 hover:text-sumi focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-aizome/50"
                     >
                       {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>
@@ -268,7 +276,7 @@ export default function SignUpForm() {
 
           <Button
             type="submit"
-            className="w-full rounded-full bg-sumi text-washi hover:bg-sumi/85"
+            className="group h-13 w-full gap-2.5 rounded-full bg-sumi px-5 text-[0.95rem] text-washi shadow-[0_10px_24px_rgba(30,28,26,0.2)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-sumi/90 hover:shadow-[0_14px_30px_rgba(30,28,26,0.28)] active:translate-y-0 active:scale-[0.98] disabled:translate-y-0 min-[380px]:px-6 sm:text-base"
             disabled={isSubmitting}
           >
             {isSubmitting ? (
@@ -277,7 +285,10 @@ export default function SignUpForm() {
                 Please wait
               </>
             ) : (
-              "Create your inbox"
+              <>
+                Create your inbox
+                <ArrowRight data-icon="inline-end" className="size-[1.1rem] transition-transform duration-200 group-hover:translate-x-1" />
+              </>
             )}
           </Button>
         </form>
@@ -292,6 +303,6 @@ export default function SignUpForm() {
           </Link>
         </div>
       </div>
-    </div>
+    </main>
   );
 }
