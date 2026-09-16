@@ -1,6 +1,5 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useSession, signOut } from 'next-auth/react';
 import type { User } from 'next-auth';
@@ -12,16 +11,12 @@ function Navbar() {
   const { data: session } = useSession();
   const user = session?.user as User | undefined;
   const pathname = usePathname();
-  const [isDashboard, setIsDashboard] = useState(false);
-
-  useEffect(() => {
-    setIsDashboard(pathname === '/dashboard');
-  }, [pathname]);
+  const isDashboard = pathname === '/dashboard';
 
   return (
-    <header className="sticky top-0 z-40 border-b border-sumi/10 bg-washi/90 backdrop-blur-md">
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
-        <Link href="/" className="group flex items-center gap-2.5">
+    <header className="fixed inset-x-0 top-3 z-40 px-3 sm:top-4 sm:px-5">
+      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between rounded-full border border-sumi/10 bg-washi/90 px-4 shadow-[0_10px_34px_rgba(30,28,26,0.12)] backdrop-blur-md sm:px-5">
+        <Link href="/" className="group flex items-center gap-2.5 rounded-full outline-none focus-visible:ring-3 focus-visible:ring-aizome/40">
           <svg
             viewBox="0 0 40 40"
             className="h-7 w-7 shrink-0 text-sumi transition-colors group-hover:text-shu"
@@ -40,7 +35,7 @@ function Navbar() {
         </Link>
 
         {session ? (
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             <span className="hidden text-sm text-kobicha sm:inline">
               {user?.username || user?.email}
             </span>
@@ -48,8 +43,7 @@ function Navbar() {
               <Button
                 render={<Link href="/dashboard" />}
                 variant="outline"
-                size="sm"
-                className="border-sumi/20 text-sumi hover:bg-sumi hover:text-washi"
+                className="h-10 gap-2 rounded-full border-sumi/20 px-4 text-sm text-sumi transition-all duration-200 hover:-translate-y-0.5 hover:border-sumi hover:bg-sumi hover:text-washi active:translate-y-0 active:scale-[0.97]"
               >
                 <LayoutDashboard data-icon="inline-start" />
                 Dashboard
@@ -58,27 +52,28 @@ function Navbar() {
             <Button
               onClick={() => signOut()}
               variant="ghost"
-              size="sm"
-              className="text-sumi hover:bg-sumi/5"
+              className="h-10 gap-2 rounded-full px-4 text-sm text-sumi transition-all duration-200 hover:bg-sumi/8 active:scale-[0.97]"
             >
               <LogOut data-icon="inline-start" />
               Sign out
             </Button>
           </div>
         ) : (
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <nav className="mr-3 hidden items-center gap-1 text-sm font-medium text-kobicha md:flex">
+              <Link href="/#how-it-works" className="rounded-full px-3 py-2 transition-colors hover:bg-sumi/5 hover:text-sumi focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-aizome/40">How it works</Link>
+              <Link href="/#safety" className="rounded-full px-3 py-2 transition-colors hover:bg-sumi/5 hover:text-sumi focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-aizome/40">Safety</Link>
+            </nav>
             <Button
               render={<Link href="/sign-in" />}
               variant="ghost"
-              size="sm"
-              className="text-sumi hover:bg-sumi/5"
+              className="hidden h-10 rounded-full px-4 text-sm text-sumi transition-all duration-200 hover:bg-sumi/8 active:scale-[0.97] min-[390px]:inline-flex"
             >
               Sign in
             </Button>
             <Button
               render={<Link href="/sign-up" />}
-              size="sm"
-              className="bg-sumi text-washi hover:bg-sumi/85"
+              className="h-10 rounded-full bg-sumi px-4 text-sm text-washi shadow-[0_5px_14px_rgba(30,28,26,0.2)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-sumi/90 hover:shadow-[0_8px_18px_rgba(30,28,26,0.28)] active:translate-y-0 active:scale-[0.97] sm:px-5"
             >
               Get started
             </Button>

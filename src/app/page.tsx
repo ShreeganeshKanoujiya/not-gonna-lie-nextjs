@@ -1,208 +1,31 @@
 import Link from 'next/link';
-import { ArrowRight, EyeOff, ShieldCheck, SlidersHorizontal } from 'lucide-react';
+import { ArrowDownRight, ArrowRight, EyeOff, MessageCircleMore, Send, ShieldCheck, SlidersHorizontal, Sparkles, type LucideIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 
-const steps = [
-  {
-    number: '01',
-    title: 'Claim your link',
-    body: 'Create an account and get a single, verified link tied to your name — not your inbox.',
-  },
-  {
-    number: '02',
-    title: 'Share it anywhere',
-    body: 'Drop it in your bio, your group chat, your story. Anyone can write to you without signing up.',
-  },
-  {
-    number: '03',
-    title: 'Read it honestly',
-    body: 'Messages land in your dashboard with no sender attached. You decide what happens next.',
-  },
-];
-
-const pillars = [
-  {
-    icon: EyeOff,
-    title: 'Anonymous by default',
-    body: 'The sender is never stored against the message. Not to you, not to us.',
-  },
-  {
-    icon: ShieldCheck,
-    title: 'Verified accounts',
-    body: 'Every inbox belongs to a real, email-verified person — so replies mean something.',
-  },
-  {
-    icon: SlidersHorizontal,
-    title: 'You hold the switch',
-    body: 'Turn message-receiving on or off in one tap. Nothing arrives without your say-so.',
-  },
+const prompts = ['Tell me something you have never said.', 'What is your honest opinion of me?', 'Describe me in three words.', 'What should I hear more often?'];
+const steps = [['01', 'Claim\nyour link', 'Make a verified inbox that is unmistakably yours.'], ['02', 'Share\nit anywhere', 'Your bio. Your group chat. Your story. Your call.'], ['03', 'Read\nit honestly', 'The words arrive. The sender stays out of it.']];
+const pillars: { icon: LucideIcon; title: string; body: string }[] = [
+  { icon: EyeOff, title: 'Anonymous\nby default.', body: 'The sender stays invisible.' },
+  { icon: ShieldCheck, title: 'Verified\naccounts.', body: 'Every inbox belongs to a real person.' },
+  { icon: SlidersHorizontal, title: 'You hold\nthe switch.', body: 'Pause new messages whenever you need.' },
 ];
 
 export default function Home() {
-  return (
-    <main className="bg-washi">
-      {/* Hero */}
-      <section className="relative overflow-hidden">
-        <div className="pointer-events-none absolute -right-24 top-0 h-[420px] w-[420px] opacity-[0.06]">
-          <svg viewBox="0 0 200 200" fill="none">
-            <path
-              d="M100 20c-46 5-80 40-75 88 5 46 47 78 92 72 41-5 68-36 72-72"
-              stroke="currentColor"
-              strokeWidth="6"
-              strokeLinecap="round"
-              className="text-sumi"
-            />
-          </svg>
-        </div>
-
-        <div className="mx-auto grid max-w-6xl gap-12 px-4 py-16 sm:px-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-center lg:py-24">
-          <div className="max-w-2xl">
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-shu/25 bg-shu/5 px-4 py-1.5 text-sm text-shu">
-              本音 · honne — what you'd say if it were safe to
-            </div>
-            <h1 className="font-display text-4xl leading-[1.12] tracking-tight text-sumi sm:text-5xl lg:text-6xl">
-              Say the honest thing.
-              <br />
-              Keep your name out of it.
-            </h1>
-            <p className="mt-6 max-w-xl text-base leading-7 text-kobicha sm:text-lg">
-              Not Gonna Lie gives your friends, teammates, and followers a
-              verified line to your inbox — the message reaches you, the
-              sender stays invisible.
-            </p>
-
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <Button
-                render={<Link href="/sign-up" />}
-                nativeButton={false}
-                size="lg"
-                className="rounded-full bg-sumi px-6 text-washi hover:bg-sumi/85"
-              >
-                Create your inbox
-                <ArrowRight data-icon="inline-end" className="ml-1" />
-              </Button>
-              <Button
-                render={<Link href="#how-it-works" />}
-                nativeButton={false}
-                size="lg"
-                variant="outline"
-                className="rounded-full border-sumi/20 px-6 text-sumi hover:bg-sumi/5"
-              >
-                See how it works
-              </Button>
-            </div>
-          </div>
-
-          <div className="relative">
-            <div className="absolute inset-0 -z-10 rounded-[2rem] bg-aizome/10 blur-3xl" />
-            <div className="rounded-[2rem] border border-sumi/10 bg-card p-6 shadow-sm">
-              <div className="mb-5 flex items-center justify-between">
-                <div>
-                  <p className="text-xs uppercase tracking-[0.3em] text-kobicha">
-                    Preview
-                  </p>
-                  <p className="font-display text-lg text-sumi">
-                    Your anonymous inbox
-                  </p>
-                </div>
-                <span className="rounded-full bg-aizome/10 px-3 py-1 text-xs text-aizome">
-                  Verified
-                </span>
-              </div>
-              <div className="space-y-3">
-                <div className="rounded-xl border border-sumi/10 bg-washi p-4">
-                  <p className="text-xs text-kobicha">Unsigned message</p>
-                  <p className="mt-2 text-sm leading-6 text-sumi">
-                    I never told you this, but your notes got me through
-                    finals. Thank you.
-                  </p>
-                </div>
-                <div className="rounded-xl border border-sumi/10 bg-washi p-4">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-kobicha">Accepting messages</span>
-                    <span className="rounded-full bg-shu/10 px-3 py-1 text-shu">
-                      On
-                    </span>
-                  </div>
-                  <div className="mt-2 flex items-center justify-between text-sm">
-                    <span className="text-kobicha">Your link</span>
-                    <span className="truncate text-sumi/70">/u/username</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* How it works — a real sequence, so numbering earns its place */}
-      <section id="how-it-works" className="border-t border-sumi/10 bg-card/50">
-        <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:py-20">
-          <p className="text-xs font-medium uppercase tracking-[0.25em] text-kobicha">
-            How it works
-          </p>
-          <h2 className="mt-2 font-display text-3xl text-sumi sm:text-4xl">
-            Three steps, one honest inbox
-          </h2>
-
-          <div className="mt-10 grid gap-8 sm:grid-cols-3">
-            {steps.map((step) => (
-              <div key={step.number} className="border-t border-sumi/15 pt-5">
-                <span className="font-display text-sm text-shu">
-                  {step.number}
-                </span>
-                <h3 className="mt-2 font-display text-lg text-sumi">
-                  {step.title}
-                </h3>
-                <p className="mt-2 text-sm leading-6 text-kobicha">
-                  {step.body}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Pillars */}
-      <section className="border-t border-sumi/10">
-        <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:py-20">
-          <div className="grid gap-4 sm:grid-cols-3">
-            {pillars.map(({ icon: Icon, title, body }) => (
-              <Card key={title} className="border-sumi/10 bg-card shadow-none">
-                <CardContent className="flex h-full flex-col gap-3 p-5">
-                  <Icon className="h-5 w-5 text-aizome" />
-                  <p className="font-display text-base text-sumi">{title}</p>
-                  <p className="text-sm leading-6 text-kobicha">{body}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Closing CTA */}
-      <section className="border-t border-sumi/10 bg-sumi">
-        <div className="mx-auto flex max-w-6xl flex-col items-start justify-between gap-6 px-4 py-14 sm:px-6 sm:flex-row sm:items-center">
-          <div>
-            <h2 className="font-display text-2xl text-washi sm:text-3xl">
-              Your honest inbox is one link away.
-            </h2>
-            <p className="mt-2 text-sm text-washi/60">
-              Free to set up. Takes under a minute.
-            </p>
-          </div>
-          <Button
-            render={<Link href="/sign-up" />}
-            nativeButton={false}
-            size="lg"
-            className="rounded-full bg-washi px-6 text-sumi hover:bg-washi/90"
-          >
-            Create your inbox
-            <ArrowRight data-icon="inline-end" className="ml-1" />
-          </Button>
-        </div>
-      </section>
-    </main>
-  );
+  return <main className="overflow-hidden bg-washi">
+    <section className="relative isolate min-h-[min(840px,100svh)] overflow-hidden bg-sumi text-washi">
+      <div className="absolute inset-0 opacity-40 [background-image:radial-gradient(circle_at_12%_17%,#ff6b8f_0,transparent_24rem),radial-gradient(circle_at_92%_73%,#a7e834_0,transparent_20rem),radial-gradient(circle_at_62%_10%,#7063ff_0,transparent_25rem)]" />
+      <div className="pointer-events-none absolute -left-20 top-32 h-64 w-64 rounded-full border border-washi/20" />
+      <div className="pointer-events-none absolute right-[8%] top-20 h-20 w-20 rotate-12 rounded-[1.7rem] bg-coral/90" />
+      <div className="relative mx-auto grid max-w-7xl gap-4 px-4 pb-12 pt-28 sm:gap-8 sm:px-6 sm:pt-32 lg:grid-cols-[1.05fr_.95fr] lg:items-center lg:px-8 lg:pb-20 lg:pt-36">
+        <div className="max-w-3xl"><div className="mb-5 inline-flex max-w-full items-center gap-2 rounded-full border border-washi/20 bg-washi/10 px-3 py-1.5 text-xs font-medium tracking-wide backdrop-blur sm:mb-7"><Sparkles className="size-3.5 shrink-0 text-lime" />本音 · honne — say it safely</div><p className="mb-3 text-xs font-bold uppercase tracking-[0.28em] text-lime">Not Gonna Lie</p><h1 className="font-display text-[clamp(3.75rem,18vw,9.5rem)] font-semibold leading-[.79] tracking-[-0.075em] text-balance sm:text-[clamp(4.5rem,11vw,9.5rem)]">Say the<br />honest<br /><span className="text-coral">thing.</span></h1><p className="mt-6 max-w-md text-base leading-7 text-washi/75 sm:mt-7 sm:text-lg">A place for the words people hold back. Your name is known; theirs is not.</p><div className="mt-7 flex flex-col gap-3 sm:mt-8 sm:flex-row"><Button render={<Link href="/sign-up" />} nativeButton={false} size="lg" className="group h-[3.25rem] w-full gap-2.5 rounded-full bg-lime px-6 text-[0.95rem] leading-none text-sumi shadow-[0_10px_24px_rgba(200,242,74,0.2)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-lime hover:shadow-[0_14px_30px_rgba(200,242,74,0.35)] active:translate-y-0 active:scale-[0.98] focus-visible:ring-lime/60 [&_svg]:block sm:h-14 sm:w-auto sm:px-7 sm:text-base">Create your inbox <ArrowRight data-icon="inline-end" className="size-[1.1rem] transition-transform duration-200 group-hover:translate-x-1" /></Button><Button render={<Link href="#how-it-works" />} nativeButton={false} size="lg" variant="outline" className="group h-[3.25rem] w-full gap-2.5 rounded-full border-washi/30 bg-washi/5 px-6 text-[0.95rem] leading-none text-washi transition-all duration-200 hover:-translate-y-0.5 hover:border-washi/60 hover:bg-washi/12 hover:text-washi active:translate-y-0 active:scale-[0.98] focus-visible:ring-washi/60 [&_svg]:block sm:h-14 sm:w-auto sm:px-7 sm:text-base">How it works <ArrowDownRight data-icon="inline-end" className="size-[1.1rem] transition-transform duration-200 group-hover:translate-y-0.5 group-hover:translate-x-0.5" /></Button></div></div>
+        <div className="relative mx-auto w-full max-w-md py-10 sm:py-12 lg:py-4"><div className="animate-float absolute -left-1 top-0 z-10 rotate-[-8deg] rounded-2xl bg-lime px-3 py-2.5 text-xs font-semibold text-sumi shadow-xl sm:-left-4 sm:px-4 sm:py-3 sm:text-sm">it needed to be said.</div><article className="relative rotate-[3deg] rounded-[1.5rem] bg-washi p-5 text-sumi shadow-2xl transition-transform duration-500 hover:rotate-[1deg] sm:rotate-[5deg] sm:rounded-[2rem] sm:p-7"><div className="flex items-center justify-between text-[0.65rem] font-medium uppercase tracking-[.14em] text-aizome sm:text-xs sm:tracking-[.18em]"><span className="flex items-center gap-1.5"><span className="size-2 rounded-full bg-coral" /> Anonymous</span><span>just now</span></div><div className="my-7 h-px bg-sumi/10 sm:my-9" /><p className="font-display text-[1.7rem] leading-[1.03] tracking-[-.035em] sm:text-4xl">“I never told you this, but your notes got me through finals.”</p><div className="mt-8 flex items-end justify-between sm:mt-10"><p className="text-sm text-kobicha">No name attached.<br />Just the truth.</p><div className="grid size-11 place-items-center rounded-full bg-sumi text-lime sm:size-12"><MessageCircleMore className="size-5" /></div></div></article><div className="animate-float-delayed absolute -right-2 bottom-2 rotate-[8deg] rounded-2xl bg-coral px-3 py-2.5 text-xs font-semibold text-washi shadow-xl sm:-right-5 sm:bottom-4 sm:px-4 sm:py-3 sm:text-sm">sent without a name</div></div>
+      </div>
+    </section>
+    <section className="bg-lime py-4 text-sumi"><div className="flex min-w-max animate-marquee items-center gap-8 text-sm font-bold uppercase tracking-[.17em]">{Array.from({ length: 7 }, (_, index) => <span key={index} className="flex items-center gap-8">No names. More honesty. <span className="size-2 rounded-full bg-coral" /></span>)}</div></section>
+    <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8 lg:py-28"><div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-end"><div><p className="text-xs font-bold uppercase tracking-[.24em] text-coral">Pick a prompt</p><h2 className="mt-3 max-w-xl font-display text-5xl leading-[.88] tracking-[-.055em] text-sumi sm:text-7xl">What do you<br />really think?</h2></div><p className="max-w-xs text-sm leading-6 text-kobicha">Tap one, share your link, and make room for the answer.</p></div><div className="-mr-4 mt-10 flex snap-x gap-4 overflow-x-auto pb-4 pr-4 [scrollbar-width:none] sm:-mr-6 sm:pr-6 lg:mr-0 lg:grid lg:grid-cols-4 lg:overflow-visible lg:pr-0">{prompts.map((prompt, index) => <article key={prompt} className={`group min-h-64 w-[78vw] shrink-0 snap-start rounded-[1.75rem] p-6 transition duration-300 hover:-translate-y-2 sm:w-72 lg:w-auto ${index === 0 ? 'bg-sumi text-washi' : index === 1 ? 'bg-coral text-washi' : index === 2 ? 'bg-aizome text-washi' : 'bg-[#dcd4ff] text-sumi'}`}><span className="text-xs font-bold tracking-[.2em] opacity-70">0{index + 1}</span><p className="mt-12 font-display text-3xl leading-[.98] tracking-[-.04em]">{prompt}</p><ArrowRight className="mt-8 size-5 transition-transform group-hover:translate-x-1" /></article>)}</div></section>
+    <section id="how-it-works" className="bg-[#e8e2f5] px-4 py-20 sm:px-6 lg:px-8 lg:py-28"><div className="mx-auto max-w-7xl"><p className="text-xs font-bold uppercase tracking-[.24em] text-coral">How it works</p><div className="mt-3 flex flex-col justify-between gap-6 lg:flex-row lg:items-end"><h2 className="max-w-3xl font-display text-5xl leading-[.86] tracking-[-.06em] text-sumi sm:text-7xl">One link.<br />Zero guesswork.</h2><p className="max-w-sm text-sm leading-6 text-kobicha">The mechanics are simple. The conversations can be anything but.</p></div><div className="mt-14 grid gap-px overflow-hidden rounded-[2rem] bg-sumi/15 sm:grid-cols-3">{steps.map(([number, title, body]) => <article key={number} className="min-h-72 bg-[#e8e2f5] p-6 sm:p-8"><p className="font-display text-6xl tracking-[-.08em] text-coral">{number}</p><h3 className="mt-12 whitespace-pre-line font-display text-3xl leading-[.9] tracking-[-.045em] text-sumi">{title}</h3><p className="mt-5 max-w-52 text-sm leading-6 text-kobicha">{body}</p></article>)}</div></div></section>
+    <section id="safety" className="relative overflow-hidden bg-sumi px-4 py-20 text-washi sm:px-6 lg:px-8 lg:py-28"><div className="absolute -right-20 top-10 size-80 rounded-full bg-aizome/60 blur-3xl" /><div className="relative mx-auto max-w-7xl"><p className="text-xs font-bold uppercase tracking-[.24em] text-lime">Your space, your rules</p><h2 className="mt-3 max-w-3xl font-display text-5xl leading-[.86] tracking-[-.06em] sm:text-7xl">Honesty feels better when it feels safe.</h2><div className="mt-14 grid gap-3 md:grid-cols-3">{pillars.map(({ icon: Icon, title, body }) => <article key={title} className="rounded-[1.75rem] border border-washi/15 bg-washi/5 p-6 backdrop-blur transition hover:bg-washi/10"><Icon className="size-5 text-lime" /><h3 className="mt-14 whitespace-pre-line font-display text-3xl leading-[.9] tracking-[-.04em]">{title}</h3><p className="mt-5 text-sm leading-6 text-washi/65">{body}</p></article>)}</div></div></section>
+    <section className="relative isolate overflow-hidden bg-washi px-4 py-24 sm:px-6 lg:px-8 lg:py-36"><div className="animate-float absolute left-[5%] top-16 hidden rotate-[-10deg] rounded-2xl bg-coral px-4 py-3 text-sm font-semibold text-washi shadow-lg md:block">you are kinder than you know</div><div className="animate-float-delayed absolute bottom-16 right-[8%] hidden rotate-[9deg] rounded-2xl bg-aizome px-4 py-3 text-sm font-semibold text-washi shadow-lg md:block">this made my day</div><div className="relative mx-auto max-w-5xl text-center"><p className="text-xs font-bold uppercase tracking-[.24em] text-coral">The point is simple</p><h2 className="mt-5 font-display text-[clamp(4rem,11vw,10rem)] leading-[.78] tracking-[-.075em] text-sumi">MAKE ROOM<br />FOR <span className="text-coral">HONESTY.</span></h2><p className="mx-auto mt-9 max-w-md text-base leading-7 text-kobicha">The compliment. The confession. The thing they have been carrying around. Let them say it.</p></div></section>
+    <section className="bg-coral px-4 py-20 text-washi sm:px-6 lg:px-8 lg:py-28"><div className="mx-auto flex max-w-7xl flex-col justify-between gap-10 lg:flex-row lg:items-end"><div><p className="text-xs font-bold uppercase tracking-[.24em] text-washi/70">Your turn</p><h2 className="mt-4 max-w-4xl font-display text-6xl leading-[.82] tracking-[-.065em] sm:text-8xl">Your honest inbox is one link away.</h2></div><div className="shrink-0"><Button render={<Link href="/sign-up" />} nativeButton={false} size="lg" className="group h-[3.5rem] w-full gap-2.5 rounded-full bg-sumi px-7 text-[0.95rem] leading-none text-washi shadow-[0_10px_24px_rgba(30,28,26,0.2)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-sumi/90 hover:shadow-[0_14px_30px_rgba(30,28,26,0.28)] active:translate-y-0 active:scale-[0.98] [&_svg]:block sm:w-auto sm:text-base">Create your inbox <Send data-icon="inline-end" className="size-[1.1rem] transition-transform duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" /></Button><p className="mt-3 text-center text-sm text-washi/70">Free to set up. Takes under a minute.</p></div></div></section>
+  </main>;
 }

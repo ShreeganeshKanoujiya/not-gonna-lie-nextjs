@@ -46,6 +46,8 @@
   --color-aizome: var(--aizome);
   --color-shu: var(--shu);
   --color-kobicha: var(--kobicha);
+  --color-coral: var(--coral);
+  --color-lime: var(--lime);
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -62,6 +64,8 @@
   --aizome: #2f4858;
   --shu: #b23a1a;
   --kobicha: #766b58;
+  --coral: #e95776;
+  --lime: #c8f24a;
 
   --background: #ede7d9;
   --foreground: #1e1c1a;
@@ -135,5 +139,33 @@
   }
   html {
     @apply font-sans;
+    scroll-behavior: smooth;
+  }
+}
+
+@keyframes float-card {
+  0%, 100% { transform: translateY(0) rotate(-8deg); }
+  50% { transform: translateY(-12px) rotate(-5deg); }
+}
+
+@keyframes float-card-delayed {
+  0%, 100% { transform: translateY(0) rotate(8deg); }
+  50% { transform: translateY(10px) rotate(5deg); }
+}
+
+@keyframes marquee {
+  to { transform: translateX(-25%); }
+}
+
+@utility animate-float { animation: float-card 5s ease-in-out infinite; }
+@utility animate-float-delayed { animation: float-card-delayed 6s ease-in-out infinite; }
+@utility animate-marquee { animation: marquee 22s linear infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
   }
 }
