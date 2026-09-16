@@ -1,11 +1,10 @@
 "use client";
 
-import React from "react";
 import axios, { AxiosError } from "axios";
 import dayjs from "dayjs";
-import { X } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import { Message } from "@/model/User";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -43,21 +42,21 @@ export function MessageCard({ message, onMessageDelete }: MessageCardProps) {
 };
 
   return (
-    <Card className="card-bordered">
-      <CardHeader>
-        <div className="flex justify-between items-center">
-          <CardTitle>{message.content}</CardTitle>
+    <Card className="rounded-[1.5rem] border border-sumi/10 bg-card py-0 shadow-[0_8px_24px_rgba(30,28,26,0.05)] transition-transform duration-200 hover:-translate-y-1">
+      <CardHeader className="gap-5 p-5 sm:p-6">
+        <div className="flex items-start justify-between gap-4">
+          <CardTitle className="font-display text-2xl leading-[1.05] tracking-[-0.035em] text-sumi">“{message.content}”</CardTitle>
           <AlertDialog>
             <AlertDialogTrigger
-              render={<Button variant="destructive" size="icon-sm" />}
+              render={<Button variant="ghost" size="icon" className="size-9 shrink-0 rounded-full text-kobicha hover:bg-coral/10 hover:text-coral" />}
             >
-              <X className="w-4 h-4" />
+              <Trash2 className="size-4" />
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
                 <AlertDialogTitle>Delete this message?</AlertDialogTitle>
                 <AlertDialogDescription>
-                  This can't be undone. The message will be permanently removed
+                  This can&apos;t be undone. The message will be permanently removed
                   from your inbox.
                 </AlertDialogDescription>
               </AlertDialogHeader>
@@ -70,11 +69,8 @@ export function MessageCard({ message, onMessageDelete }: MessageCardProps) {
             </AlertDialogContent>
           </AlertDialog>
         </div>
-        <div className="text-sm">
-          {dayjs(message.createdAt).format("MMM D, YYYY h:mm A")}
-        </div>
+        <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.16em] text-kobicha"><span className="size-1.5 rounded-full bg-coral" /> Anonymous · {dayjs(message.createdAt).format("MMM D, YYYY · h:mm A")}</div>
       </CardHeader>
-      <CardContent></CardContent>
     </Card>
   );
 }

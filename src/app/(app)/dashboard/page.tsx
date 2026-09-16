@@ -3,7 +3,6 @@
 import { MessageCard } from '@/components/MessageCard';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
 import {
   AlertDialog,
@@ -21,7 +20,7 @@ import { Message } from '@/model/User';
 import { ApiResponse } from '@/types/ApiResponse';
 import { zodResolver } from '@hookform/resolvers/zod';
 import axios, { AxiosError } from 'axios';
-import { Copy, Inbox, Loader2, RefreshCcw, Trash2 } from 'lucide-react';
+import { Copy, Inbox, Link2, Loader2, MessageCircleMore, RefreshCcw, ShieldCheck, Trash2 } from 'lucide-react';
 import { User } from 'next-auth';
 import { useSession } from 'next-auth/react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -187,58 +186,43 @@ function UserDashboard() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-5xl px-4 py-10 sm:px-6 lg:py-14">
-      <div className="mb-8">
-        <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-shu/25 bg-shu/5 px-3 py-1 text-xs text-shu">
-          本音 · honne
+    <main className="min-h-[calc(100svh-1px)] bg-washi px-4 pb-16 pt-28 sm:px-6 sm:pt-32 lg:pb-24">
+      <div className="mx-auto w-full max-w-6xl">
+        <div className="relative isolate overflow-hidden rounded-[2rem] bg-sumi px-5 py-8 text-washi shadow-[0_18px_40px_rgba(30,28,26,0.12)] sm:px-8 sm:py-10">
+          <div className="pointer-events-none absolute inset-0 opacity-45 [background-image:radial-gradient(circle_at_8%_20%,#e95776_0,transparent_22rem),radial-gradient(circle_at_88%_85%,#7063ff_0,transparent_24rem)]" />
+          <div className="relative flex flex-col gap-7 sm:flex-row sm:items-end sm:justify-between">
+            <div><div className="mb-4 inline-flex items-center gap-2 rounded-full border border-washi/20 bg-washi/10 px-3 py-1.5 text-xs font-semibold tracking-wide text-lime"><MessageCircleMore className="size-3.5" /> Your honest inbox</div><h1 className="font-display text-5xl leading-[0.85] tracking-[-0.06em] sm:text-6xl">Hello{displayName ? `, ${displayName}.` : '.'}</h1><p className="mt-4 max-w-xl text-sm leading-6 text-washi/70 sm:text-base">Everything here arrived without a name attached. Read it when you are ready.</p></div>
+            <div className="flex w-fit items-center gap-3 rounded-2xl border border-washi/15 bg-washi/10 px-4 py-3 backdrop-blur"><div className="grid size-10 place-items-center rounded-xl bg-lime text-sumi"><ShieldCheck className="size-5" /></div><div><p className="text-xs font-semibold uppercase tracking-[0.16em] text-lime">Inbox status</p><p className="mt-0.5 text-sm text-washi/75">{acceptMessages ? 'Open for messages' : 'Paused for now'}</p></div></div>
+          </div>
         </div>
-        <h1 className="font-display text-3xl text-sumi sm:text-4xl">
-          Your inbox
-        </h1>
-        <p className="mt-1 text-sm text-kobicha">
-          {displayName ? `@${displayName} — ` : ''}Everything here arrived
-          without a name attached.
-        </p>
-      </div>
 
-      <Card className="border-sumi/10 bg-card shadow-none">
-        <CardContent className="p-5 sm:p-6">
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-kobicha">
-            Your link
-          </p>
-          <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center">
-            <div className="flex-1 truncate rounded-lg border border-sumi/15 bg-washi px-3 py-2 text-sm text-sumi">
+      <Card className="mt-5 overflow-hidden rounded-[1.75rem] border-sumi/10 bg-card shadow-[0_10px_30px_rgba(30,28,26,0.06)]">
+        <CardContent className="grid gap-6 p-5 sm:p-7 lg:grid-cols-[1fr_auto] lg:items-center">
+          <div><div className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-coral"><Link2 className="size-3.5" /> Your share link</div><p className="mt-2 text-sm leading-6 text-kobicha">Share this link anywhere. People can write to you without revealing who they are.</p>
+          <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-center">
+            <div className="flex-1 truncate rounded-xl border border-sumi/12 bg-washi px-4 py-3 text-sm text-sumi">
               {profileUrl || '—'}
             </div>
             <Button
               onClick={copyToClipboard}
               variant="outline"
               disabled={!profileUrl}
-              className="border-sumi/20 text-sumi hover:bg-sumi hover:text-washi sm:w-auto"
+              className="h-11 gap-2 rounded-xl border-sumi/20 px-4 text-sumi transition-all hover:-translate-y-0.5 hover:bg-sumi hover:text-washi active:translate-y-0 active:scale-[0.98] sm:w-auto"
             >
-              <Copy data-icon="inline-start" className="h-4 w-4" />
-              Copy
+              <Copy data-icon="inline-start" className="size-4" /> Copy link
             </Button>
-          </div>
-
-          <Separator className="my-5 bg-sumi/10" />
-
-          <div className="flex items-center justify-between gap-4">
-            <div>
-              <p className="text-sm font-medium text-sumi">
-                Accepting messages
-              </p>
-              <p className="text-xs text-kobicha">
-                Turn this off any time to pause new messages
-              </p>
-            </div>
-            <div className="flex items-center gap-2">
+          </div></div>
+          <div className="flex min-h-28 items-center justify-between gap-5 rounded-2xl bg-sumi p-5 text-washi lg:min-w-80"><div className="min-w-0"><p className="text-sm font-semibold">Accepting messages</p><p className="mt-1 max-w-48 text-xs leading-5 text-washi/60">Pause new messages whenever you need.</p></div>
+            <div className="flex shrink-0 items-center">
               <Controller
                 name="acceptMessages"
                 control={control}
                 render={({ field }) => (
                   <Switch
                     checked={field.value}
+                    size="lg"
+                    aria-label={acceptMessages ? 'Stop accepting messages' : 'Start accepting messages'}
+                    className="isolate rounded-xl border-washi/40 data-checked:!bg-lime data-unchecked:!bg-washi/25 before:pointer-events-none before:absolute before:top-1/2 before:z-0 before:-translate-y-1/2 before:text-[0.6rem] before:font-extrabold before:tracking-[0.14em] data-checked:before:left-2 data-checked:before:text-sumi data-checked:before:content-['ON'] data-unchecked:before:right-2 data-unchecked:before:text-washi/75 data-unchecked:before:content-['OFF'] [&_[data-slot=switch-thumb]]:!bg-washi"
                     onCheckedChange={(checked) => {
                       field.onChange(checked);
                       handleSwitchChange(checked);
@@ -247,17 +231,14 @@ function UserDashboard() {
                   />
                 )}
               />
-              <span className="text-sm text-kobicha">
-                {acceptMessages ? 'On' : 'Off'}
-              </span>
             </div>
           </div>
         </CardContent>
       </Card>
 
-      <div className="mt-10 flex items-center justify-between">
-        <h2 className="font-display text-xl text-sumi">Messages</h2>
-        <div className="flex items-center gap-2">
+      <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div><p className="text-xs font-bold uppercase tracking-[0.22em] text-coral">Inbox</p><h2 className="mt-1 font-display text-3xl tracking-[-0.04em] text-sumi">Messages <span className="text-kobicha">({messages.length})</span></h2></div>
+        <div className="flex w-full items-center gap-2 sm:w-auto">
           <AlertDialog
             open={isDeleteDialogOpen}
             onOpenChange={setIsDeleteDialogOpen}
@@ -266,8 +247,8 @@ function UserDashboard() {
               render={
                 <Button
                   variant="destructive"
-                  size="sm"
                   disabled={messages.length === 0 || isDeletingAll}
+                  className="h-11 flex-1 rounded-xl px-4 text-sm sm:flex-none"
                 />
               }
             >
@@ -299,9 +280,8 @@ function UserDashboard() {
           </AlertDialog>
           <Button
             variant="outline"
-            size="sm"
             disabled={isLoading || isDeletingAll}
-            className="border-sumi/20 text-sumi hover:bg-sumi hover:text-washi"
+            className="h-11 flex-1 gap-2 rounded-xl border-sumi/20 px-4 text-sm text-sumi transition-all hover:-translate-y-0.5 hover:bg-sumi hover:text-washi active:translate-y-0 active:scale-[0.98] sm:flex-none"
             onClick={() => fetchMessages(true)}
           >
             {isLoading ? (
@@ -315,7 +295,7 @@ function UserDashboard() {
       </div>
 
       {messages.length > 0 ? (
-        <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+        <div className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-2">
           {messages.map((message) => (
             <MessageCard
               key={String(message._id)}
@@ -325,15 +305,16 @@ function UserDashboard() {
           ))}
         </div>
       ) : (
-        <div className="mt-4 flex flex-col items-center gap-3 rounded-2xl border border-dashed border-sumi/15 bg-card/50 px-6 py-16 text-center">
-          <Inbox className="h-8 w-8 text-kobicha" />
-          <p className="text-sm text-kobicha">
+        <div className="mt-5 flex flex-col items-center gap-3 rounded-[1.75rem] border border-dashed border-sumi/20 bg-card/60 px-6 py-16 text-center">
+          <div className="grid size-14 place-items-center rounded-2xl bg-sumi text-lime"><Inbox className="size-6" /></div>
+          <p className="max-w-sm text-sm leading-6 text-kobicha">
             No messages yet. Share your link above to start hearing from
             people.
           </p>
         </div>
       )}
-    </div>
+      </div>
+    </main>
   );
 }
 
