@@ -2,7 +2,7 @@
 
 import axios, { AxiosError } from "axios";
 import dayjs from "dayjs";
-import { Loader2, Trash2 } from "lucide-react";
+import { Loader2, Share2, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { Message } from "@/model/User";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
@@ -22,6 +22,7 @@ import {
 import { Button } from "./ui/button";
 import { toast } from "sonner";
 import { ApiResponse } from "@/types/ApiResponse";
+import { ShareMessageDialog } from "@/components/ShareMessageDialog";
 
 type MessageCardProps = {
   message: Message;
@@ -30,6 +31,7 @@ type MessageCardProps = {
 
 export function MessageCard({ message, onMessageDelete }: MessageCardProps) {
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isShareOpen, setIsShareOpen] = useState(false);
 
   const handleDeleteConfirm = async () => {
     setIsDeleting(true);
@@ -54,6 +56,16 @@ export function MessageCard({ message, onMessageDelete }: MessageCardProps) {
       <CardHeader className="gap-5 p-5 sm:p-6">
         <div className="flex items-start justify-between gap-4">
           <CardTitle className="font-display text-2xl leading-[1.05] tracking-[-0.035em] text-sumi">“{message.content}”</CardTitle>
+          <div className="flex shrink-0 items-center gap-1">
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label="Share this message"
+            onClick={() => setIsShareOpen(true)}
+            className="size-9 shrink-0 rounded-full text-kobicha hover:bg-aizome/10 hover:text-aizome"
+          >
+            <Share2 className="size-4" />
+          </Button>
           <AlertDialog>
             <AlertDialogTrigger
               render={<Button variant="ghost" size="icon" className="size-9 shrink-0 rounded-full text-kobicha hover:bg-coral/10 hover:text-coral" />}
@@ -100,9 +112,16 @@ export function MessageCard({ message, onMessageDelete }: MessageCardProps) {
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
+          </div>
         </div>
         <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.16em] text-kobicha"><span className="size-1.5 rounded-full bg-coral" /> Anonymous · {dayjs(message.createdAt).format("MMM D, YYYY · h:mm A")}</div>
       </CardHeader>
+
+      <ShareMessageDialog
+        open={isShareOpen}
+        onOpenChange={setIsShareOpen}
+        message={message.content}
+      />
     </Card>
   );
 }
