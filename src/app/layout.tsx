@@ -4,6 +4,8 @@ import "./globals.css";
 import AuthProvider from "@/context/AuthProvider";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import DashboardFooter from "@/components/DashboardFooter";
+import SiteFooter from "@/components/SiteFooter";
 import { Toaster } from "@/components/ui/sonner";
 
 const shipporiMincho = Shippori_Mincho({
@@ -38,7 +40,7 @@ export default function RootLayout({
         <AuthProvider>
           <Navbar />
           <div className="flex-1">{children}</div>
-          <Footer />
+          <SiteFooter marketing={<Footer />} dashboard={<DashboardFooter />} />
           <Toaster />
         </AuthProvider>
       </body>
