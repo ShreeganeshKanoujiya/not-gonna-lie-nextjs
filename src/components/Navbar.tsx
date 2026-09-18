@@ -3,15 +3,38 @@
 import Link from 'next/link';
 import { useSession, signOut } from 'next-auth/react';
 import type { User } from 'next-auth';
-import { usePathname } from 'next/navigation';
-import { LayoutDashboard, LogOut } from 'lucide-react';
+import { usePathname, useRouter } from 'next/navigation';
+import { LayoutDashboard, Loader2, LogOut } from 'lucide-react';
+import { useState } from 'react';
+import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 
 function Navbar() {
   const { data: session } = useSession();
   const user = session?.user as User | undefined;
   const pathname = usePathname();
+  const router = useRouter();
   const isDashboard = pathname === '/dashboard';
+  const [isSigningOut, setIsSigningOut] = useState(false);
+
+  // signOut() defaults to redirect:true, which assigns window.location.href to
+  // the current URL. From /dashboard that is a full document reload of a page
+  // the middleware then 302s to /sign-in, so signing out cost two page loads.
+  // With redirect:false next-auth clears the cookie, updates the session in
+  // place, and leaves the navigation to the client router.
+  const handleSignOut = async () => {
+    setIsSigningOut(true);
+    try {
+      await signOut({ redirect: false });
+      toast.success('Signed out', { description: 'See you next time.' });
+      router.replace('/sign-in');
+    } catch {
+      toast.error('Could not sign you out', {
+        description: 'Check your connection and try again.',
+      });
+      setIsSigningOut(false);
+    }
+  };
 
   return (
     <header className="fixed inset-x-0 top-3 z-40 px-3 sm:top-4 sm:px-5">
@@ -50,12 +73,17 @@ function Navbar() {
               </Button>
             )}
             <Button
-              onClick={() => signOut()}
+              onClick={handleSignOut}
+              disabled={isSigningOut}
               variant="ghost"
               className="h-10 gap-2 rounded-full px-4 text-sm text-sumi transition-all duration-200 hover:bg-sumi/8 active:scale-[0.97]"
             >
-              <LogOut data-icon="inline-start" />
-              Sign out
+              {isSigningOut ? (
+                <Loader2 data-icon="inline-start" className="animate-spin" />
+              ) : (
+                <LogOut data-icon="inline-start" />
+              )}
+              {isSigningOut ? 'Signing out…' : 'Sign out'}
             </Button>
           </div>
         ) : (
