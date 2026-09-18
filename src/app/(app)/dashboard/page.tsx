@@ -27,6 +27,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Controller, useForm, useWatch } from 'react-hook-form';
 import { z } from 'zod';
 import { acceptMessageSchema } from '@/schemas/acceptMessageSchema';
+import { DashboardSkeleton, MessageCardSkeleton } from '@/components/DashboardSkeleton';
 
 type AcceptMessageFormData = z.infer<typeof acceptMessageSchema>;
 
@@ -38,7 +39,8 @@ function UserDashboard() {
   const [isFetchingSettings, setIsFetchingSettings] = useState(false);
   const [isTogglePending, setIsTogglePending] = useState(false);
   const [profileUrl, setProfileUrl] = useState('');
-  const { data: session } = useSession();
+  const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
+  const { data: session, status: sessionStatus } = useSession();
 
   const handleDeleteMessage = (messageId: string) => {
     setMessages((prev) =>
@@ -103,6 +105,7 @@ function UserDashboard() {
       }
     } finally {
       setIsLoading(false);
+      setHasLoadedOnce(true);
     }
   }, []);
 
@@ -181,6 +184,14 @@ function UserDashboard() {
     return (session.user as User).username ?? '';
   }, [session]);
 
+  // Full-page skeleton until the session resolves and the first fetch lands.
+  const isInitialLoading =
+    sessionStatus === 'loading' || (Boolean(session?.user) && !hasLoadedOnce);
+
+  if (isInitialLoading) {
+    return <DashboardSkeleton />;
+  }
+
   if (!session?.user) {
     return <div></div>;
   }
@@ -191,28 +202,31 @@ function UserDashboard() {
         <div className="relative isolate overflow-hidden rounded-[2rem] bg-sumi px-5 py-8 text-washi shadow-[0_18px_40px_rgba(30,28,26,0.12)] sm:px-8 sm:py-10">
           <div className="pointer-events-none absolute inset-0 opacity-45 [background-image:radial-gradient(circle_at_8%_20%,#e95776_0,transparent_22rem),radial-gradient(circle_at_88%_85%,#7063ff_0,transparent_24rem)]" />
           <div className="relative flex flex-col gap-7 sm:flex-row sm:items-end sm:justify-between">
-            <div><div className="mb-4 inline-flex items-center gap-2 rounded-full border border-washi/20 bg-washi/10 px-3 py-1.5 text-xs font-semibold tracking-wide text-lime"><MessageCircleMore className="size-3.5" /> Your honest inbox</div><h1 className="font-display text-5xl leading-[0.85] tracking-[-0.06em] sm:text-6xl">Hello{displayName ? `, ${displayName}.` : '.'}</h1><p className="mt-4 max-w-xl text-sm leading-6 text-washi/70 sm:text-base">Everything here arrived without a name attached. Read it when you are ready.</p></div>
+            <div className="min-w-0"><div className="mb-4 inline-flex items-center gap-2 rounded-full border border-washi/20 bg-washi/10 px-3 py-1.5 text-xs font-semibold tracking-wide text-lime"><MessageCircleMore className="size-3.5" /> Your honest inbox</div><h1 className="font-display text-5xl leading-[0.85] tracking-[-0.06em] break-words sm:text-6xl">Hello{displayName ? `, ${displayName}.` : '.'}</h1><p className="mt-4 max-w-xl text-sm leading-6 text-washi/70 sm:text-base">Everything here arrived without a name attached. Read it when you are ready.</p></div>
             <div className="flex w-fit items-center gap-3 rounded-2xl border border-washi/15 bg-washi/10 px-4 py-3 backdrop-blur"><div className="grid size-10 place-items-center rounded-xl bg-lime text-sumi"><ShieldCheck className="size-5" /></div><div><p className="text-xs font-semibold uppercase tracking-[0.16em] text-lime">Inbox status</p><p className="mt-0.5 text-sm text-washi/75">{acceptMessages ? 'Open for messages' : 'Paused for now'}</p></div></div>
           </div>
         </div>
 
       <Card className="mt-5 overflow-hidden rounded-[1.75rem] border-sumi/10 bg-card shadow-[0_10px_30px_rgba(30,28,26,0.06)]">
-        <CardContent className="grid gap-6 p-5 sm:p-7 lg:grid-cols-[1fr_auto] lg:items-center">
-          <div><div className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-coral"><Link2 className="size-3.5" /> Your share link</div><p className="mt-2 text-sm leading-6 text-kobicha">Share this link anywhere. People can write to you without revealing who they are.</p>
-          <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-center">
-            <div className="flex-1 truncate rounded-xl border border-sumi/12 bg-washi px-4 py-3 text-sm text-sumi">
+        <CardContent className="grid gap-6 p-5 sm:p-7 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
+          <div className="min-w-0"><div className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-coral"><Link2 className="size-3.5" /> Your share link</div><p className="mt-2 text-sm leading-6 text-kobicha">Share this link anywhere. People can write to you without revealing who they are.</p>
+          <div className="mt-4 flex w-full min-w-0 flex-col gap-2 sm:flex-row sm:items-center">
+            <div
+              title={profileUrl || undefined}
+              className="w-full min-w-0 flex-1 truncate rounded-xl border border-sumi/12 bg-washi px-4 py-3 text-sm text-sumi"
+            >
               {profileUrl || '—'}
             </div>
             <Button
               onClick={copyToClipboard}
               variant="outline"
               disabled={!profileUrl}
-              className="h-11 gap-2 rounded-xl border-sumi/20 px-4 text-sumi transition-all hover:-translate-y-0.5 hover:bg-sumi hover:text-washi active:translate-y-0 active:scale-[0.98] sm:w-auto"
+              className="h-11 w-full shrink-0 gap-2 rounded-xl border-sumi/20 px-4 text-sumi transition-all hover:-translate-y-0.5 hover:bg-sumi hover:text-washi active:translate-y-0 active:scale-[0.98] sm:w-auto"
             >
               <Copy data-icon="inline-start" className="size-4" /> Copy link
             </Button>
           </div></div>
-          <div className="flex min-h-28 items-center justify-between gap-5 rounded-2xl bg-sumi p-5 text-washi lg:min-w-80"><div className="min-w-0"><p className="text-sm font-semibold">Accepting messages</p><p className="mt-1 max-w-48 text-xs leading-5 text-washi/60">Pause new messages whenever you need.</p></div>
+          <div className="flex min-h-28 min-w-0 items-center justify-between gap-5 rounded-2xl bg-sumi p-5 text-washi lg:min-w-80"><div className="min-w-0"><p className="text-sm font-semibold">Accepting messages</p><p className="mt-1 max-w-48 text-xs leading-5 text-washi/60">Pause new messages whenever you need.</p></div>
             <div className="flex shrink-0 items-center">
               <Controller
                 name="acceptMessages"
@@ -294,7 +308,13 @@ function UserDashboard() {
         </div>
       </div>
 
-      {messages.length > 0 ? (
+      {isLoading && messages.length === 0 ? (
+        <div className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-2">
+          {Array.from({ length: 2 }).map((_, index) => (
+            <MessageCardSkeleton key={index} />
+          ))}
+        </div>
+      ) : messages.length > 0 ? (
         <div className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-2">
           {messages.map((message) => (
             <MessageCard
