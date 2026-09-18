@@ -9,7 +9,8 @@ export default async function proxy(request: NextRequest) {
     url.pathname === '/' ||
     url.pathname.startsWith('/sign-in') ||
     url.pathname.startsWith('/sign-up') ||
-    url.pathname.startsWith('/verify')
+    url.pathname.startsWith('/verify') ||
+    url.pathname.startsWith('/forgot-password')
 
   if (token && isPublicAuthPage) {
     return NextResponse.redirect(new URL('/dashboard', request.url))
@@ -30,5 +31,6 @@ export const config = {
     '/',
     '/dashboard/:path*',
     '/verify/:path*',
+    '/forgot-password',
   ],
 }

@@ -23,6 +23,11 @@ export interface User extends Document {
     password: string;
     verifyCode: string;
     verifyCodeExpires: Date;
+    // Password reset. Cleared once the new password is saved, when the code
+    // expires, or when the attempt cap is reached.
+    resetPasswordCode?: string;
+    resetPasswordCodeExpires?: Date;
+    resetPasswordAttempts?: number;
     isVerified: boolean;
     isAcceptingMessage: boolean;
     message: Message[]
@@ -53,6 +58,15 @@ const UserSchema: Schema<User> = new Schema({
     verifyCodeExpires: {
         type: Date,
         required: [true, 'Verification code expiration date is required'],
+    },
+    resetPasswordCode: {
+        type: String,
+    },
+    resetPasswordCodeExpires: {
+        type: Date,
+    },
+    resetPasswordAttempts: {
+        type: Number,
     },
     isVerified: {
         type: Boolean,

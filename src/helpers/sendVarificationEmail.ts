@@ -1,75 +1,37 @@
-import { ApiResponse } from "@/types/ApiResponse";
-import { readFile } from "node:fs/promises";
-import path from "node:path";
-import nodemailer from "nodemailer";
-
-const verificationTemplatePath = path.join(
-    process.cwd(),
-    "emails",
-    "verification_email.html"
-);
-
-function escapeHtml(value: string): string {
-    return value.replace(/[&<>'\"]/g, (character) => ({
-        "&": "&amp;",
-        "<": "&lt;",
-        ">": "&gt;",
-        "'": "&#39;",
-        '"': "&quot;",
-    })[character] ?? character);
-}
-
-function getMailerConfig() {
-    const { SMTP_HOST, SMTP_PORT, SMTP_SECURE, SMTP_USER, SMTP_PASS, MAIL_FROM } = process.env;
-
-    if (!SMTP_HOST || !SMTP_PORT || !SMTP_USER || !SMTP_PASS || !MAIL_FROM) {
-        throw new Error(
-            "Missing SMTP configuration. Set SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, and MAIL_FROM."
-        );
-    }
-
-    const port = Number(SMTP_PORT);
-    if (!Number.isInteger(port) || port <= 0) {
-        throw new Error("SMTP_PORT must be a valid port number.");
-    }
-
-    return {
-        host: SMTP_HOST,
-        port,
-        secure: SMTP_SECURE === "true",
-        auth: {
-            user: SMTP_USER,
-            pass: SMTP_PASS,
-        },
-        from: MAIL_FROM,
-    };
-}
+import { renderEmailTemplate, sendMail, type MailResult } from "@/lib/mailer";
+import { describeMailError, mailErrorHint } from "@/lib/mailError";
 
 export async function sendVerificationEmail(
     email: string,
     username: string,
     verifyCode: string
-): Promise<ApiResponse> {
+): Promise<MailResult> {
     try {
-        const config = getMailerConfig();
-        const template = await readFile(verificationTemplatePath, "utf8");
-        const html = template
-            .replace(/{{to_name}}/g, escapeHtml(username))
-            .replace(/{{otp_code}}/g, escapeHtml(verifyCode))
-            .replace(/{{expiry_minutes}}/g, "60")
-            .replace(/{{current_year}}/g, String(new Date().getFullYear()));
-
-        const transporter = nodemailer.createTransport({
-            host: config.host,
-            port: config.port,
-            secure: config.secure,
-            auth: config.auth,
+        const html = await renderEmailTemplate("verification_email.html", {
+            to_name: username,
+            otp_code: verifyCode,
+            expiry_minutes: "60",
+            current_year: String(new Date().getFullYear()),
         });
 
-        await transporter.sendMail({
-            from: config.from,
+        await sendMail({
             to: email,
-            subject: 'Not Gonna Lie - Verify Your Email',
+            // Code-first subject is the shape every major transactional sender
+            // uses, and it shows the code in a notification without opening.
+            subject: `Not Gonna Lie - Verification Code`,
+            text: [
+                `Hello ${username},`,
+                "",
+                "Your Not Gonna Lie verification code is:",
+                "",
+                `    ${verifyCode}`,
+                "",
+                "It expires in 60 minutes.",
+                "",
+                "Didn't request this? Ignore this email - no account is created without the code.",
+                "",
+                "- Not Gonna Lie",
+            ].join("\n"),
             html,
         });
 
@@ -79,11 +41,17 @@ export async function sendVerificationEmail(
             messages: [],
         }
     } catch (emailError) {
-        console.error("Error sending verification email:", emailError);
+        const detail = describeMailError(emailError);
+        const hint = mailErrorHint(emailError);
+
+        console.error("[verify-email] failed to send email:", detail);
+        if (hint) console.error("[verify-email] hint:", hint);
+
         return {
             success: false,
             message: "Failed to send verification email.",
             messages: [],
+            detail: hint ? `${detail} — ${hint}` : detail,
         }
     }
 }
