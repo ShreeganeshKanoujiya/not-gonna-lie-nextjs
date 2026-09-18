@@ -27,14 +27,20 @@ export default function SignInForm() {
   const onSubmit = async (data: z.infer<typeof signInSchema>) => {
     const result = await signIn('credentials', { redirect: false, identifier: data.identifier, password: data.password });
 
-    if (result?.error) {
-      toast.error(result.error === 'CredentialsSignin' ? 'Login failed' : 'Error', {
-        description: result.error === 'CredentialsSignin' ? 'Incorrect username or password.' : result.error,
+    // A missing result means the request never landed, so treat it as a failure
+    // rather than falling through to the success path.
+    if (!result || result.error) {
+      const isBadCredentials = result?.error === 'CredentialsSignin';
+      toast.error(isBadCredentials ? 'Login failed' : 'Something went wrong', {
+        description: isBadCredentials
+          ? 'Incorrect username or password.'
+          : result?.error ?? 'We could not reach the server. Try again.',
       });
       return;
     }
 
-    if (result?.url) router.replace('/dashboard');
+    toast.success('Welcome back', { description: 'Opening your inbox.' });
+    router.replace('/dashboard');
   };
 
   return (
