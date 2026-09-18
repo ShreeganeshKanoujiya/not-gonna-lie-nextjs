@@ -11,7 +11,9 @@ import {
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
+  AlertDialogEyebrow,
   AlertDialogHeader,
+  AlertDialogMedia,
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
@@ -179,6 +181,14 @@ function UserDashboard() {
     }
   };
 
+  const messageCountLabel = useMemo(
+    () =>
+      messages.length === 1
+        ? 'Your one message'
+        : `All ${messages.length} of your messages`,
+    [messages.length],
+  );
+
   const displayName = useMemo(() => {
     if (!session?.user) return '';
     return (session.user as User).username ?? '';
@@ -275,19 +285,38 @@ function UserDashboard() {
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
-                <AlertDialogTitle>Delete all messages?</AlertDialogTitle>
+                <AlertDialogMedia>
+                  <Trash2 />
+                </AlertDialogMedia>
+                <div className="space-y-2">
+                  <AlertDialogEyebrow>Can&apos;t be undone</AlertDialogEyebrow>
+                  <AlertDialogTitle>
+                    Empty your inbox?
+                  </AlertDialogTitle>
+                </div>
                 <AlertDialogDescription>
-                  This permanently removes every message from your inbox. This action cannot be undone.
+                  {messageCountLabel} will be permanently deleted. We keep no
+                  copy, and senders are never told.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel disabled={isDeletingAll}>Cancel</AlertDialogCancel>
+                <AlertDialogCancel disabled={isDeletingAll}>Keep them</AlertDialogCancel>
                 <AlertDialogAction
-                  variant="destructive"
                   disabled={isDeletingAll}
                   onClick={handleDeleteAllMessages}
+                  className="bg-destructive text-washi hover:bg-destructive/90"
                 >
-                  Delete all messages
+                  {isDeletingAll ? (
+                    <>
+                      <Loader2 className="size-4 animate-spin" />
+                      Deleting…
+                    </>
+                  ) : (
+                    <>
+                      <Trash2 className="size-4" />
+                      Delete everything
+                    </>
+                  )}
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>

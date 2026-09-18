@@ -22,6 +22,8 @@ function AlertDialogPortal({ ...props }: AlertDialogPrimitive.Portal.Props) {
   )
 }
 
+// Warm ink wash rather than a neutral scrim — a destructive confirm should
+// genuinely lift off the page, and black/10 barely dimmed it.
 function AlertDialogOverlay({
   className,
   ...props
@@ -30,7 +32,7 @@ function AlertDialogOverlay({
     <AlertDialogPrimitive.Backdrop
       data-slot="alert-dialog-overlay"
       className={cn(
-        "fixed inset-0 isolate z-50 bg-black/10 duration-100 supports-backdrop-filter:backdrop-blur-xs data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0",
+        "fixed inset-0 isolate z-50 bg-sumi/50 duration-200 supports-backdrop-filter:backdrop-blur-[3px] data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0",
         className
       )}
       {...props}
@@ -52,7 +54,7 @@ function AlertDialogContent({
         data-slot="alert-dialog-content"
         data-size={size}
         className={cn(
-          "group/alert-dialog-content fixed top-1/2 left-1/2 z-50 grid w-full -translate-x-1/2 -translate-y-1/2 gap-4 rounded-xl bg-popover p-4 text-popover-foreground ring-1 ring-foreground/10 duration-100 outline-none data-[size=default]:max-w-xs data-[size=sm]:max-w-xs data-[size=default]:sm:max-w-sm data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95",
+          "group/alert-dialog-content fixed top-1/2 left-1/2 z-50 grid w-[calc(100vw-2rem)] max-w-md -translate-x-1/2 -translate-y-1/2 gap-5 overflow-hidden rounded-[1.75rem] border border-sumi/10 bg-card p-6 text-sumi shadow-[0_24px_60px_rgba(30,28,26,0.24)] duration-200 outline-none data-[size=sm]:max-w-sm sm:p-7 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-open:slide-in-from-bottom-2 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95",
           className
         )}
         {...props}
@@ -61,6 +63,9 @@ function AlertDialogContent({
   )
 }
 
+// Always left-aligned, matching every other surface in the app. The previous
+// version centred on mobile and flipped to the left at `sm`, so the same
+// dialog read as two different designs depending on the viewport.
 function AlertDialogHeader({
   className,
   ...props
@@ -68,10 +73,7 @@ function AlertDialogHeader({
   return (
     <div
       data-slot="alert-dialog-header"
-      className={cn(
-        "grid grid-rows-[auto_1fr] place-items-center gap-1.5 text-center has-data-[slot=alert-dialog-media]:grid-rows-[auto_auto_1fr] has-data-[slot=alert-dialog-media]:gap-x-4 sm:group-data-[size=default]/alert-dialog-content:place-items-start sm:group-data-[size=default]/alert-dialog-content:text-left sm:group-data-[size=default]/alert-dialog-content:has-data-[slot=alert-dialog-media]:grid-rows-[auto_1fr]",
-        className
-      )}
+      className={cn("flex flex-col items-start gap-3 text-left", className)}
       {...props}
     />
   )
@@ -85,7 +87,7 @@ function AlertDialogFooter({
     <div
       data-slot="alert-dialog-footer"
       className={cn(
-        "-mx-4 -mb-4 flex flex-col-reverse gap-2 rounded-b-xl border-t bg-muted/50 p-4 group-data-[size=sm]/alert-dialog-content:grid group-data-[size=sm]/alert-dialog-content:grid-cols-2 sm:flex-row sm:justify-end",
+        "-mx-6 -mb-6 flex flex-col-reverse gap-2 border-t border-sumi/10 bg-washi/60 px-6 py-4 sm:-mx-7 sm:-mb-7 sm:flex-row sm:justify-end sm:px-7 sm:py-5",
         className
       )}
       {...props}
@@ -100,8 +102,27 @@ function AlertDialogMedia({
   return (
     <div
       data-slot="alert-dialog-media"
+      aria-hidden="true"
       className={cn(
-        "mb-2 inline-flex size-10 items-center justify-center rounded-md bg-muted sm:group-data-[size=default]/alert-dialog-content:row-span-2 *:[svg:not([class*='size-'])]:size-6",
+        "inline-flex size-11 items-center justify-center rounded-2xl bg-destructive/10 text-destructive *:[svg:not([class*='size-'])]:size-5",
+        className
+      )}
+      {...props}
+    />
+  )
+}
+
+// Small uppercase kicker above the title, the same device the dashboard uses
+// for "Your share link" and "Inbox".
+function AlertDialogEyebrow({
+  className,
+  ...props
+}: React.ComponentProps<"p">) {
+  return (
+    <p
+      data-slot="alert-dialog-eyebrow"
+      className={cn(
+        "text-xs font-bold uppercase tracking-[0.2em] text-destructive",
         className
       )}
       {...props}
@@ -117,7 +138,7 @@ function AlertDialogTitle({
     <AlertDialogPrimitive.Title
       data-slot="alert-dialog-title"
       className={cn(
-        "font-heading text-base font-medium sm:group-data-[size=default]/alert-dialog-content:group-has-data-[slot=alert-dialog-media]/alert-dialog-content:col-start-2",
+        "font-display text-2xl leading-[1.1] tracking-[-0.04em] text-sumi",
         className
       )}
       {...props}
@@ -133,7 +154,7 @@ function AlertDialogDescription({
     <AlertDialogPrimitive.Description
       data-slot="alert-dialog-description"
       className={cn(
-        "text-sm text-balance text-muted-foreground md:text-pretty *:[a]:underline *:[a]:underline-offset-3 *:[a]:hover:text-foreground",
+        "text-sm leading-6 text-kobicha text-pretty *:[a]:underline *:[a]:underline-offset-3 *:[a]:hover:text-sumi",
         className
       )}
       {...props}
@@ -148,7 +169,10 @@ function AlertDialogAction({
   return (
     <Button
       data-slot="alert-dialog-action"
-      className={cn(className)}
+      className={cn(
+        "h-11 gap-2 rounded-xl px-5 text-sm transition-all hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98]",
+        className
+      )}
       {...props}
     />
   )
@@ -156,7 +180,7 @@ function AlertDialogAction({
 
 function AlertDialogCancel({
   className,
-  variant = "outline",
+  variant = "ghost",
   size = "default",
   ...props
 }: AlertDialogPrimitive.Close.Props &
@@ -164,7 +188,10 @@ function AlertDialogCancel({
   return (
     <AlertDialogPrimitive.Close
       data-slot="alert-dialog-cancel"
-      className={cn(className)}
+      className={cn(
+        "h-11 rounded-xl px-5 text-sm text-kobicha transition-all hover:bg-sumi/8 hover:text-sumi active:scale-[0.98]",
+        className
+      )}
       render={<Button variant={variant} size={size} />}
       {...props}
     />
@@ -177,6 +204,7 @@ export {
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
+  AlertDialogEyebrow,
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogMedia,

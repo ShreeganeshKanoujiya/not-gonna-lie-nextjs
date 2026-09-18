@@ -2,7 +2,8 @@
 
 import axios, { AxiosError } from "axios";
 import dayjs from "dayjs";
-import { Trash2 } from "lucide-react";
+import { Loader2, Trash2 } from "lucide-react";
+import { useState } from "react";
 import { Message } from "@/model/User";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -12,7 +13,9 @@ import {
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
+  AlertDialogEyebrow,
   AlertDialogHeader,
+  AlertDialogMedia,
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
@@ -26,20 +29,25 @@ type MessageCardProps = {
 };
 
 export function MessageCard({ message, onMessageDelete }: MessageCardProps) {
+  const [isDeleting, setIsDeleting] = useState(false);
+
   const handleDeleteConfirm = async () => {
-  try {
-    const response = await axios.delete<ApiResponse>(
-      `/api/delete-message/${message._id}`,
-    );
-    toast.success(response.data.message || "Message deleted successfully");
-    onMessageDelete(String(message._id));
-  } catch (error) {
-    const axiosError = error as AxiosError<ApiResponse>;
-    toast.error(
-      axiosError.response?.data.message ?? "Failed to delete message",
-    );
-  }
-};
+    setIsDeleting(true);
+    try {
+      const response = await axios.delete<ApiResponse>(
+        `/api/delete-message/${message._id}`,
+      );
+      toast.success(response.data.message || "Message deleted successfully");
+      onMessageDelete(String(message._id));
+    } catch (error) {
+      const axiosError = error as AxiosError<ApiResponse>;
+      toast.error(
+        axiosError.response?.data.message ?? "Failed to delete message",
+      );
+      // Only reset on failure — a success unmounts this card.
+      setIsDeleting(false);
+    }
+  };
 
   return (
     <Card className="rounded-[1.5rem] border border-sumi/10 bg-card py-0 shadow-[0_8px_24px_rgba(30,28,26,0.05)] transition-transform duration-200 hover:-translate-y-1">
@@ -54,16 +62,40 @@ export function MessageCard({ message, onMessageDelete }: MessageCardProps) {
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
-                <AlertDialogTitle>Delete this message?</AlertDialogTitle>
+                <AlertDialogMedia>
+                  <Trash2 />
+                </AlertDialogMedia>
+                <div className="space-y-2">
+                  <AlertDialogEyebrow>Can&apos;t be undone</AlertDialogEyebrow>
+                  <AlertDialogTitle>Delete this message?</AlertDialogTitle>
+                </div>
                 <AlertDialogDescription>
-                  This can&apos;t be undone. The message will be permanently removed
-                  from your inbox.
+                  It leaves your inbox for good. We keep no copy, and the sender
+                  is never told.
                 </AlertDialogDescription>
               </AlertDialogHeader>
+              {/* The backdrop hides the card, so restate which message this is. */}
+              <blockquote className="line-clamp-3 rounded-2xl border border-sumi/10 bg-washi px-4 py-3.5 font-display text-lg leading-snug tracking-[-0.03em] text-sumi">
+                “{message.content}”
+              </blockquote>
               <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction onClick={handleDeleteConfirm}>
-                  Delete
+                <AlertDialogCancel disabled={isDeleting}>Keep it</AlertDialogCancel>
+                <AlertDialogAction
+                  disabled={isDeleting}
+                  onClick={handleDeleteConfirm}
+                  className="bg-destructive text-washi hover:bg-destructive/90"
+                >
+                  {isDeleting ? (
+                    <>
+                      <Loader2 className="size-4 animate-spin" />
+                      Deleting…
+                    </>
+                  ) : (
+                    <>
+                      <Trash2 className="size-4" />
+                      Delete message
+                    </>
+                  )}
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
